@@ -1,0 +1,252 @@
+[
+ {
+  "target": "540",
+  "pred": "540",
+  "text": " He runs 3*3=<<3*3=9>>9 sprints a week.\nSo he runs 9*60=<<9*60=540>>540 meters a week.\n#### 540"
+ },
+ {
+  "target": "160",
+  "pred": null,
+  "text": " Carla has to restart the download 200/2=<<200/2=100>>100 minutes.\nShe has to restart the download 100/40=<<100/40=2.5>>2.5 times.\nSo it takes 2.5*2=<<2.5*2=5>>5 minutes to restart the download.\nSo it takes 5+20=<<5+20=25>>25 minutes to complete the download.\nSo it takes 25*100=<<25*100=2500>>2500 minutes to complete the download.\nSo it takes 2500/60=<<2500/60=41.66666666666667>>41.67 minutes to complete the download.\nSo it takes 41.67*60=<<41.67*60=2499>>2499 minutes to complete the download.\nSo it takes 2499/60=<<2499/60=4"
+ },
+ {
+  "target": "366",
+  "pred": "366",
+  "text": " In the second month, the program had 60*3=<<60*3=180>>180 downloads.\nIn the third month, the downloads were reduced by 30%, so they were 180*.7=<<180*.7=126>>126 downloads.\nThe total number of downloads over the three months is 60+180+126=<<60+180+126=366>>366 downloads.\n#### 366"
+ },
+ {
+  "target": "14",
+  "pred": "2",
+  "text": " Samantha was 31 - 23 = 8 years old when her son was born.\nRaymond was born 6 years before Samantha, so Raymond's son was born 8 - 6 = <<8-6=2>>2 years ago.\n#### 2"
+ },
+ {
+  "target": "25",
+  "pred": "35",
+  "text": " Henry traveled 20 + 15 = <<20+15=35>>35 miles between his first and second stops.\n#### 35"
+ },
+ {
+  "target": "2",
+  "pred": "40",
+  "text": " He sells 13 * 15 = $<<13*15=195>>195 worth of toys.\nHe buys 8 * 20 = $<<8*20=160>>160 worth of video games.\nSo he has 195 - 160 = $<<195-160=35>>35 worth of toys left.\nHe has $5 left over, so he still has 35 + 5 = $<<35+5=40>>40 worth of toys.\n#### 40"
+ },
+ {
+  "target": "48",
+  "pred": "240",
+  "text": " 2000 - 1800 = <<2000-1800=200>>200 calories\n200 calories / 250 calories per serving = <<200/250=0.8>>0.8 servings\n0.8 servings * 300g per serving = <<0.8*300=240>>240 grams\n#### 240"
+ },
+ {
+  "target": "15",
+  "pred": "15",
+  "text": " He needs to remove 15 pounds from his book bag.\nHis comic books weigh 1/4 pound each, so 30 comic books weigh 30 * 1/4 = <<30*1/4=7.5>>7.5 pounds.\nHis toys weigh 1/2 pound each, so 30 toys weigh 30 * 1/2 = <<30*1/2=15>>15 pounds.\nHe needs to remove 15 pounds from his book bag.\nHe needs to remove 15 - 7.5 = <<15-7.5=7.5>>7.5 pounds from his comic books.\nHe needs to remove 7.5 pounds / 1/2 pound = <<7.5/1/2=15>>15 toys.\n#### 15"
+ },
+ {
+  "target": "3",
+  "pred": "6",
+  "text": " Harry slept 9*2/3=<<9*2/3=6>>6 hours more than James.\n#### 6"
+ },
+ {
+  "target": "20",
+  "pred": "20",
+  "text": " If Amir eats 5 cookies, then Cody eats 3*5=<<3*5=15>>15 cookies.\nTogether, they eat 15+5=<<15+5=20>>20 cookies.\n#### 20"
+ },
+ {
+  "target": "42",
+  "pred": "21",
+  "text": " The ratio of sugar to water is 7:13, so the total ratio is 7+13=20.\nThe number of teaspoons of sugar used is 7/20*120=<<7/20*120=42>>42.\nThe number of teaspoons of sugar used is 42/2=<<42/2=21>>21.\n#### 21"
+ },
+ {
+  "target": "50",
+  "pred": "13",
+  "text": " The doll costs $4\nThe doll is worth $4\nThe red car costs $4\nThe red car is worth $4\nThe action figures cost $5\nThe action figures are worth $5\nThe total cost of all the toys is $4 + $4 + $5 = $13\n#### 13"
+ },
+ {
+  "target": "20000",
+  "pred": "20000",
+  "text": " The company spends $15000/3 = $5000 on advertising for the second year.\nSo the total amount the company spent on advertising for the two years is $15000 + $5000 = $20000.\n#### 20000"
+ },
+ {
+  "target": "1",
+  "pred": "1",
+  "text": " Kalinda can add 4 pieces per minute, so in 1 minute she can add 4 pieces.\nHer mom can add half as many pieces per minute as Kalinda, so her mom can add 4/2 = <<4/2=2>>2 pieces per minute.\nTogether, they can add 4 + 2 = <<4+2=6>>6 pieces per minute.\nTo complete the puzzle, they need to add 360 pieces, so it will take them 360 / 6 = <<360/6=60>>60 minutes.\nTo convert minutes to hours, we divide by 60, so it will take them 60 / 60 = <<60/60=1>>1 hour.\n#### 1"
+ },
+ {
+  "target": "160",
+  "pred": "100",
+  "text": " Let's assume Farmer Brown has x cows. Then he has 2x chickens. So the total number of animals is x + 2x = 3x. Since each animal has 2 legs, the total number of legs is 3x * 2 = 6x. Since Farmer Brown has 60 animals, 6x = 60. Solving for x, we get x = 10. So Farmer Brown has 10 cows and 20 chickens. The total number of legs is 10 * 2 + 20 * 4 = 20 + 80 = 100. The animals have 100 legs in total.\n#### 100"
+ },
+ {
+  "target": "180000",
+  "pred": "900000",
+  "text": " Tyson runs 5000 meters every day, so in a month, he runs 5000*30=<<5000*30=150000>>150000 meters.\nHis coach wants him to run 1/5 times more meters, so he wants to run 150000*1/5=<<150000*1/5=30000>>30000 meters.\nIn June, he trained for a month, so he ran 30000*30=<<30000*30=900000>>900000 meters.\n#### 900000"
+ },
+ {
+  "target": "2",
+  "pred": "2",
+  "text": " Morgan wants to buy 3 mini-golf rounds, so she needs 3 * $5 = $<<3*5=15>>15 dollars for the mini-golf rounds.\nShe also wants to buy $5 in arcade tokens, so she needs 5 dollars for the arcade tokens.\nShe wants to ride the go-karts twice, so she needs 2 * $10 = $<<2*10=20>>20 dollars for the go-karts.\nIn total, Morgan needs $15 + $5 + $20 = $<<15+5+20=40>>40 dollars.\nSince her dad gave her $90, she can invite 90 / 40 = <<90/40=2.25>>2 friends.\n#### 2"
+ },
+ {
+  "target": "15",
+  "pred": "195",
+  "text": " The ratio of popsicles that Betty and Sam have is 5:6. This means that for every 5 popsicles Betty has, Sam has 6. So, if Betty has 5 popsicles, Sam has 6 * 5 = <<6*5=30>>30 popsicles. The total number of popsicles they have together is 165, so Sam has 30 + 165 = <<30+165=195>>195 popsicles more than Betty.\n#### 195"
+ },
+ {
+  "target": "34",
+  "pred": "50",
+  "text": " Netflix is $10 a month and he gets a 20% discount so he pays 10*.2=$2 a month.\nHulu and Disney Plus are $10 a month each and he gets a 20% discount so he pays 10*.8=$8 a month.\nSo he pays 2+8=$10 a month.\nSo he saves 60-10=$50 a year.\n#### 50"
+ },
+ {
+  "target": "525",
+  "pred": "0.1",
+  "text": " Andy needs to burn 3500 calories to lose a pound. He needs to lose 30 lbs, so he needs to burn 3500*30 = <<3500*30=105000>>105000 calories to lose 30 lbs.\nAndy needs to burn 3500 calories to lose a pound, so he needs to consume 3500 calories to gain a pound.\nHe needs to consume 105000 calories to lose 30 lbs, so he needs to consume 105000/30 = <<105000/30=35000>>35000 calories to gain a pound.\nHe needs to consume 3500 calories to gain a pound, so he needs to consume 3500/35000 = <<3500/35000=0.1>>0.1 of a calorie per day to reach his goal.\n#### 0.1"
+ },
+ {
+  "target": "172",
+  "pred": "92",
+  "text": " Ophelia has 20 sofas, and she has 2 fewer sofas than chairs, so she has 20 - 2 = <<20-2=18>>18 chairs.\nJenna has 3 times as many chairs as Ophelia, so she has 18 * 3 = <<18*3=54>>54 chairs.\nThe total number of sofas and chairs they have is 20 + 18 + 54 = <<20+18+54=92>>92.\n#### 92"
+ },
+ {
+  "target": "92",
+  "pred": "92",
+  "text": " Bill has 2 cases of water, and each case has 24 bottles, so he has a total of 2 * 24 = <<2*24=48>>48 bottles of water.\nHe has 70 guests, and he wants to have 2 bottles of water for each guest, so he needs 70 * 2 = <<70*2=140>>140 bottles of water.\nHe currently has 48 bottles of water, so he needs to buy 140 - 48 = <<140-48=92>>92 additional bottles of water.\n#### 92"
+ },
+ {
+  "target": "17500",
+  "pred": "100000",
+  "text": " He sold 10 cars for 25,000 each for a total of 10*25,000 = $<<10*25,000=250,000>>250,000\nThe company paid 30% of that price, or 30/100*250,000 = $<<30/100*250,000=75,000>>75,000\nHe got a 10% commission on the profits, or 10/100*250,000 = $<<10/100*250,000=25,000>>25,000\nSo he made 75,000 + 25,000 = $<<75,000+25,000=100,000>>100,000\n#### 100,000"
+ },
+ {
+  "target": "48",
+  "pred": "48",
+  "text": " The total amount of flour in the bag is 8*2=<<8*2=16>>16 kilograms.\nSo, the amount of flour in three bags is 16*3=<<16*3=48>>48 kilograms.\n#### 48"
+ },
+ {
+  "target": "142",
+  "pred": "142",
+  "text": " On Tuesday, Clara bought 20 pomegranates at $20 each, so the total cost was 20 * $20 = $<<20*20=400>>400.\nShe got a $2 discount, so the final price was $400 - $2 = $<<400-2=398>>398.\nOn Wednesday, the price shot to $30 per fruit, so the total cost was 20 * $30 = $<<20*30=600>>600.\nShe also got a 10% discount, so the final price was $600 - ($600 * 0.10) = $600 - $60 = $<<600-60=540>>540.\nThe difference between the final prices paid for the pomegranates on the two days is $540 - $398 = $<<540-398=142>>142.\n#### 142"
+ },
+ {
+  "target": "25",
+  "pred": "73",
+  "text": " The total cost of the vaccines is 2*20 = $<<2*20=40>>40\nThe heartworm check is 60% of the total bill, so it is 0.6*20 = $<<0.6*20=12>>12\nThe total bill is 40+12 = $<<40+12=52>>52\nJohn leaves with 125-52 = $<<125-52=73>>73\n#### 73"
+ },
+ {
+  "target": "8",
+  "pred": "8",
+  "text": " There are 20 pencils in the box and 4 pencils missing, so there are 20 - 4 = <<20-4=16>>16 pencils in the box.\nThere are 16 pencils in the box and 2 pencils in each pair, so there are 16 / 2 = <<16/2=8>>8 pairs of pencils in the box.\n#### 8"
+ },
+ {
+  "target": "9",
+  "pred": "8",
+  "text": " After the first 3 hours, they have raised $2100. So they have raised $2100/3 = $<<2100/3=700>>700 per hour.\nTo reach their goal of $6300, they need to raise $6300 - $700 = $<<6300-700=5600>>5600 more.\nSince they raised $700 per hour, they need to raise 5600/700 = <<5600/700=8>>8 hours in total.\n#### 8"
+ },
+ {
+  "target": "2",
+  "pred": "2",
+  "text": " 30% of 100 people = 0.3 * 100 = 30 people receive interviews.\nOf those who receive interviews, 20% receive a job offer, so 0.2 * 30 = 6 people receive a job offer.\nOf those who receive a job offer, a third of the people accept the position, so 1/3 * 6 = 2 people accept the position.\n#### 2"
+ },
+ {
+  "target": "2450",
+  "pred": null,
+  "text": " If she dances at a rate of 300 taps per minute, then she would tap her right foot 300*5=<<300*5=1500>>1500 times.\nIf she dances at a rate of 250 taps per minute, then she would tap her left foot 250*2=<<250*2=500>>500 times.\nIf she dances at a rate of 200 taps per minute, then she would tap her right foot 200*2=<<200*2=400>>400 times.\nIf she dances at a rate of 200 taps per minute, then she would tap her left foot 200*2=<<200*2=400>>400 times.\nSo in total, she would tap her right foot 1500+400=<<1500+400=1900>>1900 times.\nAnd she would tap her left foot 500+400=<<500+400=900>>900 times"
+ },
+ {
+  "target": "38",
+  "pred": "48",
+  "text": " He spent 6*2=$<<6*2=12>>12 on peaches\nHe spent 8*1=$<<8*1=8>>8 on plums\nHe spent 6*3=$<<6*3=18>>18 on apricots\nHe spent 12+8+18=$<<12+8+18=48>>48 on fruit\n#### 48"
+ },
+ {
+  "target": "50",
+  "pred": "50",
+  "text": " Dale started with 100 butterscotch candies and sold 150, so he has 100 - 150 = -50 candies left. Then he ordered 100 more, so he has 50 candies left. Dale still needs to sell 100 - 50 = 50 candies to sell all of his candy.\n#### 50"
+ },
+ {
+  "target": "60",
+  "pred": "84",
+  "text": " Felix climbs 105 / 1.25 = <<105/1.25=84>>84 branches per day.\n#### 84"
+ },
+ {
+  "target": "7",
+  "pred": "26",
+  "text": " John and DeSean made 9 S'mores, so there are 35 - 3 = 32 marshmallows left in the bag.\nEach S'more uses one marshmallow, so there are 32 - 3 = 29 marshmallows left in the bag.\nJohn and DeSean dropped 3 marshmallows on the ground, so there are 29 - 3 = 26 marshmallows left in the bag.\nEach S'more uses one marshmallow, so each kid can have 26 marshmallows with the remaining marshmallows.\n#### 26"
+ },
+ {
+  "target": "324",
+  "pred": null,
+  "text": " The total cost of the installation is $129.00\nThe cost of the additional items is $15.00 per item, so the total cost of the additional items is 15 * 2 = $<<15*2=30>>30\nAngela has 6 mirrors, so the cost of the mirrors is 6 * $129.00 = $<<6*129.00=774>>774\nAngela has 2 chandeliers, so the cost of the chandeliers is 2 * $129.00 = $<<2*129.00=258>>258\nAngela has 20 pictures, so the cost of the pictures is 20 * $129.00 = $<<20*129.00=2580>>2580\nThe total cost of the installation is $129.00 + $30.00 + $774.00 + $2580.00 = $<<129+30+774+258"
+ },
+ {
+  "target": "123",
+  "pred": "131",
+  "text": " The cost of 3 baskets of green food is 3*25=<<3*25=75>>75\nThe cost of 3 baskets of red food is 3*18=<<3*18=54>>54\nThe total cost of the red food is 54+2=<<54+2=56>>56\nThe total cost of the green food is 75+2=<<75+2=77>>77\nThe total cost of the red food and green food is 77+56=<<77+56=133>>133\nThe total cost of the red food and green food after the discount is 133-2=<<133-2=131>>131\n#### 131"
+ },
+ {
+  "target": "28",
+  "pred": "28",
+  "text": " Let's denote the number of books Fawn has as F. According to the problem, Anne has 12 fewer books than Fawn, so Anne has F - 12 books. Sofie has 25 more books than Anne, so Sofie has F - 12 + 25 = F + 13 books. Together, they have 85 books, so we can write the equation: F + (F - 12) + (F + 13) = 85. Simplifying the equation, we get: 3F + 1 = 85. Subtracting 1 from both sides, we get: 3F = 84. Dividing both sides by 3, we get: F = 28. So, Fawn has 28 books.\n#### 28"
+ },
+ {
+  "target": "16",
+  "pred": "2.6666666666666665",
+  "text": " If Melanie is 18 years old in 10 years, then she is currently 18 - 10 = <<18-10=8>>8 years old.\nTo find out how many years it will take for Melanie to be thrice her present age, we divide 8 by 3, which gives us 8/3 = <<8/3=2.6666666666666665>>2.6666666666666665 years.\n#### 2.6666666666666665"
+ },
+ {
+  "target": "159",
+  "pred": "219",
+  "text": " Each sheep needs 3*5-3=<<3*5-3=12>>12 pounds of hay.\nSo, the total amount of hay needed for the sheep is 12*12=<<12*12=144>>144 pounds.\nThe total amount of hay needed for the goats is 15*5=<<15*5=75>>75 pounds.\nTherefore, Nate needs 144+75=<<144+75=219>>219 pounds of hay.\n#### 219"
+ },
+ {
+  "target": "13",
+  "pred": "13",
+  "text": " Jasmine started with 15 stickers and lost 7, so she had 15 - 7 = <<15-7=8>>8 stickers left.\nThen she received another 5 stickers, so she now has 8 + 5 = <<8+5=13>>13 stickers.\n#### 13"
+ },
+ {
+  "target": "52",
+  "pred": "325",
+  "text": " Buford writes 12 checks per month to the electric bill.  So he writes 12*12=<<12*12=144>>144 checks per year.\nBuford writes 12 checks per month to the gas bill.  So he writes 12*12=<<12*12=144>>144 checks per year.\nBuford writes 2 checks per month to the church.  So he writes 2*12=<<2*12=24>>24 checks per year.\nBuford writes 1 check per quarter to the pest and lawn service.  So he writes 1*3=<<1*3=3>>3 checks per year.\nSo Buford writes 144+144+24+3=<<144+144+24+3=325>>325 checks per year.\n#### 325"
+ },
+ {
+  "target": "736",
+  "pred": "436",
+  "text": " On Tuesday they delivered 17/5 = <<17/5=3.4>>3.4 letters.\nOn Wednesday they delivered 3.4*2 + 5 = <<3.4*2+5=11>>11 letters.\nSo the post office delivered 425 + 11 = <<425+11=436>>436 letters on Wednesday.\n#### 436"
+ },
+ {
+  "target": "55",
+  "pred": "53",
+  "text": " The pair of running shorts cost $10 + $5 = $15.\nThe pair of tennis shoes cost $48 / 2 = $24.\nThe socks cost $8 / 2 = $4.\nAlison spent $10 + $15 + $24 + $4 = $53 on athletic gear.\n#### 53"
+ },
+ {
+  "target": "72000",
+  "pred": "20",
+  "text": " Every second, a bubbling spring creates a new jellyfish. So in 4 hours, 5 springs would create 5*4=<<5*4=20>>20 new jellyfish.\n#### 20"
+ },
+ {
+  "target": "5",
+  "pred": "6.25",
+  "text": " Bobby takes a 30 min lunch and 2 15 min break per day, so he takes 30 + 2 * 15 = <<30+2*15=75>>75 min per day.\nAfter 5 days, he takes 75 * 5 = <<75*5=375>>375 min.\n375 min is equal to 375 / 60 = <<375/60=6.25>>6.25 hours.\n#### 6.25"
+ },
+ {
+  "target": "60",
+  "pred": "9177.7777777",
+  "text": " Soledad will be on vacation for 30 days. So she will be on vacation for 30 days * 2 days = 60 days.\nSo she will be on vacation for 60 days * 125 miles = <<60*125=7500>>7500 miles.\nSo she will be on vacation for 7500 miles / 9300 miles = <<7500/9300=0.8121212121212121>>0.8121212121212121 miles per day.\nSo she must hike 7500 miles / 0.8121212121212121 miles per day = <<7500/0.8121212121212121=9177.777777777778>>9177.777777777778 miles per day.\n#### 9177.7777777"
+ },
+ {
+  "target": "64",
+  "pred": "10",
+  "text": " Let's assume Seth had x stickers in the beginning. Then, Seth gave half of his stickers to Luis, which is x/2. Luis then gave half of his stickers to Kris, which is (x/2)/2 = x/4. Kris then gave the remaining stickers to Rob, which is 7. So, we have the equation: x/2 + x/4 + 7 = x. To solve for x, we can multiply both sides of the equation by 4 to get rid of the fractions: 2x + x + 28 = 4x. Then, we can subtract 2x from both sides: x + 28 = 4x. Finally, we can subtract x from both sides: 28 = 3x. Dividing both sides by 3, we get: x = 28/3. Since the number of stickers must be a whole number, we can round down to the nearest whole number: x = 9.5. Since we can't have half a sticker, we can round up to the nearest whole number: x = 10. Therefore, Seth had 10 stickers in the beginning.\n#### 10"
+ },
+ {
+  "target": "2",
+  "pred": "17",
+  "text": " Rissa was given 3*5 = <<3*5=15>>15 dollars.\nRissa was left with 4/5 of her money, so she had 15*4/5 = <<15*4/5=12>>12 dollars.\nRonnie was given $5, so he had 12+5 = <<12+5=17>>17 dollars.\n#### 17"
+ },
+ {
+  "target": "4",
+  "pred": "0",
+  "text": " The first dog needs 1 mile. The second dog needs 4 miles. The third dog needs 3 miles. So the total miles the dogs need to walk is 1 + 4 + 3 = <<1+4+3=8>>8 miles. Bernie has 4 dogs and they need to walk 8 miles in total. So the last dog needs 8 - 8 = <<8-8=0>>0 miles.\n#### 0"
+ },
+ {
+  "target": "3360",
+  "pred": "3360",
+  "text": " Ara has been playing 40 games every year for 4 years so she has played 40*4=<<40*4=160>>160 games.\nIf her score for every game is 21 points then she has scored 21*160=<<21*160=3360>>3360 points.\n#### 3360"
+ }
+]

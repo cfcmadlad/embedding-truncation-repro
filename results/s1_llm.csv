@@ -1,0 +1,13 @@
+task,variant,metric,value,n
+HellaSwag,full,acc,0.37,200
+HellaSwag,full,acc_norm,0.5,200
+MMLU,full,acc,0.48,200
+GSM8K,full,strict_em,0.32,50
+HellaSwag,first_removed,acc,0.28,200
+HellaSwag,first_removed,acc_norm,0.405,200
+MMLU,first_removed,acc,0.415,200
+GSM8K,first_removed,strict_em,0.0,50
+HellaSwag,last_removed,acc,0.32,200
+HellaSwag,last_removed,acc_norm,0.375,200
+MMLU,last_removed,acc,0.365,200
+GSM8K,last_removed,strict_em,0.0,50

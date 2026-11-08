@@ -4,7 +4,7 @@
   "dataset": "NanoSciFact",
   "ours": 0.696706235408783,
   "pytrec_eval": 0.6967062090055108,
-  "max_abs_diff": 3.9670637996813696e-08
+  "max_abs_diff": 3.7102419137013953e-08
  },
  {
   "model": "mpnet",
@@ -23,8 +23,8 @@
  {
   "model": "contriever",
   "dataset": "NanoArguAna",
-  "ours": 0.4601004719734192,
+  "ours": 0.46124762296676636,
   "pytrec_eval": 0.46124766137554746,
-  "max_abs_diff": 0.06932342052459717
+  "max_abs_diff": 2.1402009775517428e-08
  }
 ]
