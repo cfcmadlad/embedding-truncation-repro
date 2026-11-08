@@ -1,0 +1,5 @@
+model,degrading,improving,tie
+contriever,341,427,0
+e5,244,524,0
+minilm,230,154,0
+mpnet,382,382,4

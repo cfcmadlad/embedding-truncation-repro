@@ -1,0 +1,7 @@
+model_key,model,device,dtype_encode,gpu_duty_cycle,texts,seconds
+contriever,facebook/contriever,cuda:0,torch.float16,0.5,166078,518.13
+e5,intfloat/e5-base-v2,cuda:0,torch.float16,0.5,166078,646.05
+minilm,sentence-transformers/paraphrase-MiniLM-L3-v2,cuda:0,torch.float16,0.5,166078,129.42
+mpnet,sentence-transformers/all-mpnet-base-v2,cuda:0,torch.float16,0.5,166078,476.46
+mrl,tomaarsen/mpnet-base-nli-matryoshka,cuda:0,torch.float16,0.5,166078,831.08
+nonmrl,tomaarsen/mpnet-base-nli,cuda:0,torch.float16,0.5,166078,357.46

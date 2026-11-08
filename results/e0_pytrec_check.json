@@ -1,0 +1,30 @@
+[
+ {
+  "model": "mpnet",
+  "dataset": "NanoSciFact",
+  "ours": 0.696706235408783,
+  "pytrec_eval": 0.6967062090055108,
+  "max_abs_diff": 3.9670637996813696e-08
+ },
+ {
+  "model": "mpnet",
+  "dataset": "NanoArguAna",
+  "ours": 0.5890770554542542,
+  "pytrec_eval": 0.5882005974339858,
+  "max_abs_diff": 0.0438237722408612
+ },
+ {
+  "model": "contriever",
+  "dataset": "NanoSciFact",
+  "ours": 0.6854608654975891,
+  "pytrec_eval": 0.6854608829689215,
+  "max_abs_diff": 3.938498505107191e-08
+ },
+ {
+  "model": "contriever",
+  "dataset": "NanoArguAna",
+  "ours": 0.4601004719734192,
+  "pytrec_eval": 0.46124766137554746,
+  "max_abs_diff": 0.06932342052459717
+ }
+]

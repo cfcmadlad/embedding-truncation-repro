@@ -55,6 +55,11 @@ def legend_outside(ax_or_fig, **kw) -> None:
     ax_or_fig.legend(**kw)
 
 
+def figure_legend(fig, handles, labels, right: float = 0.76) -> tuple[float, float, float, float]:
+    fig.legend(handles, labels, loc="center right", bbox_to_anchor=(0.995, 0.5), frameon=False)
+    return (0, 0, right, 1)
+
+
 def save(fig, name: str, rect: tuple[float, float, float, float] = (0, 0, 1, 1)) -> Path:
     FIG_DIR.mkdir(exist_ok=True)
     fig.tight_layout(rect=rect)

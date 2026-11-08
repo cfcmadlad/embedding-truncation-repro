@@ -13,7 +13,10 @@ def device() -> torch.device:
 
 
 def n_jobs() -> int:
-    return int(os.environ.get("TRUNBED_JOBS", "8"))
+    return int(os.environ.get("TRUNBED_JOBS", "6"))
+
+
+torch.set_num_threads(n_jobs())
 
 
 def similarity(q: torch.Tensor, d: torch.Tensor, sim: str) -> torch.Tensor:

@@ -1,0 +1,100 @@
+{
+ "synthetic": [
+  {
+   "removed": 1,
+   "max_abs_diff_dot": 0.0,
+   "max_abs_diff_cos": 2.7755575615628914e-16
+  },
+  {
+   "removed": 10,
+   "max_abs_diff_dot": 4.973799150320701e-14,
+   "max_abs_diff_cos": 2.498001805406602e-16
+  },
+  {
+   "removed": 384,
+   "max_abs_diff_dot": 9.947598300641403e-14,
+   "max_abs_diff_cos": 4.163336342344337e-16
+  },
+  {
+   "removed": 700,
+   "max_abs_diff_dot": 2.4868995751603507e-14,
+   "max_abs_diff_cos": 3.3306690738754696e-16
+  }
+ ],
+ "cached": [
+  {
+   "model": "minilm",
+   "removed": 1,
+   "max_abs_diff_dot": 0.0,
+   "max_abs_diff_cos": 0.0
+  },
+  {
+   "model": "minilm",
+   "removed": 192,
+   "max_abs_diff_dot": 0.0,
+   "max_abs_diff_cos": 0.0
+  },
+  {
+   "model": "mpnet",
+   "removed": 1,
+   "max_abs_diff_dot": 0.0,
+   "max_abs_diff_cos": 0.0
+  },
+  {
+   "model": "mpnet",
+   "removed": 384,
+   "max_abs_diff_dot": 0.0,
+   "max_abs_diff_cos": 1.3322676295501878e-15
+  },
+  {
+   "model": "contriever",
+   "removed": 1,
+   "max_abs_diff_dot": 0.0,
+   "max_abs_diff_cos": 2.7755575615628914e-16
+  },
+  {
+   "model": "contriever",
+   "removed": 384,
+   "max_abs_diff_dot": 0.0,
+   "max_abs_diff_cos": 9.992007221626409e-16
+  },
+  {
+   "model": "e5",
+   "removed": 1,
+   "max_abs_diff_dot": 0.0,
+   "max_abs_diff_cos": 0.0
+  },
+  {
+   "model": "e5",
+   "removed": 384,
+   "max_abs_diff_dot": 0.0,
+   "max_abs_diff_cos": 1.9984014443252818e-15
+  },
+  {
+   "model": "mrl",
+   "removed": 1,
+   "max_abs_diff_dot": 0.0,
+   "max_abs_diff_cos": 4.440892098500626e-16
+  },
+  {
+   "model": "mrl",
+   "removed": 384,
+   "max_abs_diff_dot": 0.0,
+   "max_abs_diff_cos": 1.3322676295501878e-15
+  },
+  {
+   "model": "nonmrl",
+   "removed": 1,
+   "max_abs_diff_dot": 0.0,
+   "max_abs_diff_cos": 0.0
+  },
+  {
+   "model": "nonmrl",
+   "removed": 384,
+   "max_abs_diff_dot": 0.0,
+   "max_abs_diff_cos": 1.6653345369377348e-15
+  }
+ ],
+ "worst_abs_diff": 9.947598300641403e-14,
+ "identical_within_1e-10": true
+}
