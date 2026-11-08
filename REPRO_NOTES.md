@@ -96,6 +96,9 @@ Paper: Takeshita et al., "Randomly Removing 50% of Dimensions in Text Embeddings
 - S1 runs Qwen2.5-0.5B (896 hidden dims) instead of Qwen2.5-7B and Llama 3.1 8B, on 200 HellaSwag validation items, 200 MMLU test items (0-shot, letter log likelihood) and 50 GSM8K test items (5-shot with the first 5 training items as shots, greedy, max 256 new tokens, strict match on `#### N`), sampled with seed 0. It does not use lm-evaluation-harness; scoring is our own. The final normed hidden state and the matching columns of the untied unembedding are sliced. It ran unthrottled on the local RTX 4060 Laptop GPU in fp16.
 - The demo shares its logic with the CLI through `demo/core.py`, which is not in the CLAUDE.md layout. Full PCA fits per model are cached in `cache/pca/` and sliced for each K.
 
+- CLAUDE.md asks for Python 3.10+. The pinned versions (numpy 2.5.2, scipy 1.16.3, matplotlib 3.11.0, transformers 5.22.2) need Python 3.12 or later, so the pinned environment requires Python 3.12+; it was developed and run on 3.13.7.
+- Phase 4 (S1) is opt in in `run_all.sh` (`RUN_S1=1`) because it needs a GPU and downloads a model and benchmark items; everything else runs offline from `cache/`.
+
 ## Runtimes
 
 | Step | Hardware | Time |

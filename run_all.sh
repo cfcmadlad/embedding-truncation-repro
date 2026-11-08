@@ -23,4 +23,8 @@ $PY scripts/e10_anisotropy.py
 $PY scripts/x1_leakage.py
 $PY scripts/x2_bootstrap.py
 $PY scripts/x3_theory.py
+if [ "${RUN_S1:-0}" = "1" ]; then
+  HF_HUB_OFFLINE=0 $PY scripts/s1_llm_truncation.py --prepare
+  $PY scripts/s1_llm_truncation.py
+fi
 $PY scripts/demo_cli.py --model mpnet --dataset NanoSciFact --k 50 --method random --seed 0

@@ -5,37 +5,13 @@ import math
 import numpy as np
 import torch
 
-from src.attribution import loo_ndcg_per_query
-from src.data import CACHE
+from src.attribution import loo_cached
 from src.evaluate import RetrievalEval
-
-ATTR_DIR = CACHE / "attr"
-
-
-def loo_matrix(ev: RetrievalEval) -> np.ndarray:
-    path = ATTR_DIR / ev.model / f"{ev.name}.npy"
-    if path.exists():
-        try:
-            arr = np.load(path)
-            if arr.shape == (ev.q.shape[1], ev.q.shape[0]):
-                return arr
-        except (ValueError, OSError):
-            pass
-    arr = loo_ndcg_per_query(ev)
-    if not path.exists():
-        path.parent.mkdir(parents=True, exist_ok=True)
-        tmp = path.with_name(path.stem + f".tmp{np.random.randint(1 << 30)}.npy")
-        np.save(tmp, arr)
-        try:
-            tmp.replace(path)
-        except OSError:
-            tmp.unlink(missing_ok=True)
-    return arr
 
 
 def loo_deltas(ev: RetrievalEval, noise: float = 1e-6) -> tuple[np.ndarray, np.ndarray]:
     full = ev.ndcg()
-    d = loo_matrix(ev) - full[None, :]
+    d = loo_cached(ev.model, ev.name) - full[None, :]
     d[np.abs(d) < noise] = 0.0
     return d, full
 
