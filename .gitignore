@@ -179,3 +179,17 @@ cython_debug/
 #  refer to https://docs.cursor.com/context/ignore-files
 .cursorignore
 .cursorindexingignore
+# Project
+cache/
+*.safetensors
+*.bin
+*.pt
+*.ckpt
+*.onnx
+.env
+.env.*
+*.token
+hf_token*
+.venv/
+.streamlit/secrets.toml
+logs/

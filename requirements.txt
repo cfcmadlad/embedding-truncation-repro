@@ -1,0 +1,14 @@
+--extra-index-url https://download.pytorch.org/whl/cu126
+torch==2.9.0
+numpy==2.5.2
+scipy==1.16.3
+scikit-learn==1.7.2
+pandas==2.3.3
+pyarrow==21.0.0
+matplotlib==3.11.0
+datasets==5.0.1
+huggingface_hub==1.32.0
+sentence-transformers==6.2.0
+transformers==5.22.2
+streamlit==1.51.0
+pytrec_eval-terrier==0.5.11
