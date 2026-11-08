@@ -119,9 +119,9 @@ def correlations(conc: pd.DataFrame) -> pd.DataFrame:
 def plot_concentration(conc: pd.DataFrame, corr: pd.DataFrame) -> None:
     metrics = [
         ("participation_ratio", "Participation ratio"),
-        ("pred_spearman50", "Predicted Spearman at 50%"),
+        ("pred_spearman50", "Predicted Spearman, 50%"),
         ("isoscore", "IsoScore"),
-        ("corr_mean", "Mean |inter-dim correlation|"),
+        ("corr_mean", "Mean |inter-dim corr|"),
     ]
     r = corr.set_index("metric")
     fig, axes = figure(2, 2, sharey=True)
@@ -133,7 +133,7 @@ def plot_concentration(conc: pd.DataFrame, corr: pd.DataFrame) -> None:
         for _, row in d.iterrows():
             ax.scatter(row[metric], row.rel50_random, color=MODEL_COLORS[row.model], s=120, zorder=3)
         txt = f"r = {r.loc[metric, 'pearson']:.2f}" if metric in r.index else "r = n/a"
-        ax.set_xlabel(f"{label} ({txt})")
+        ax.set_xlabel(f"{label}\n{txt}")
     fig.supylabel("Relative nDCG@10 at 50% random removal (%)", fontsize=18)
     handles = [Line2D([], [], color=MODEL_COLORS[m], marker="o", ls="", markersize=12, label=MODELS[m].label) for m in conc.model]
     axes[0, 1].legend(handles=handles, loc="upper left", bbox_to_anchor=(1.02, 1.0), frameon=False)

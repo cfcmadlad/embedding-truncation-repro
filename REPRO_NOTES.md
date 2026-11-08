@@ -78,7 +78,9 @@ Paper: Takeshita et al., "Randomly Removing 50% of Dimensions in Text Embeddings
 
 ## Verification
 
-- Our nDCG@10 equals pytrec_eval `ndcg_cut_10` to 4e-8 per query on NanoSciFact. On NanoArguAna one of 50 queries differs because two duplicate documents get exactly equal scores at ranks 9 and 10; pytrec_eval breaks ties by document id, torch `topk` does not. Mean differs by 0.003. Results in `results/e0_pytrec_check.json`.
+- Our nDCG@10 equals pytrec_eval `ndcg_cut_10` to 4e-8 per query on NanoSciFact for every model checked. On NanoArguAna one or two of 50 queries differ because duplicate documents get exactly equal scores near rank 10; pytrec_eval breaks ties by document id, torch `topk` does not. Means differ by at most 0.003. Results in `results/e0_pytrec_check.json`.
+- Contriever similarity: CLAUDE.md specifies dot product. We checked cosine as an alternative because the paper's Contriever Spearman (0.85) is higher than ours (0.79). Cosine gives Spearman 0.847 but full nDCG@10 0.451 (paper 0.524), random 50% 94.8% (paper 87.3) and PCA 100.5% (paper 77.3); dot gives 0.528, 88.7% and 85.8%. Dot product is therefore what the paper used, and we kept it.
+- Removing and zeroing dimensions give identical cosine and dot scores (max difference 1e-13), `results/e5_remove_vs_zero.json`.
 
 ## Deviations
 
@@ -86,5 +88,33 @@ Paper: Takeshita et al., "Randomly Removing 50% of Dimensions in Text Embeddings
 - The `mteb/mtop_intent` repository is a loading script dataset that `datasets` 5 no longer runs; we read its `en/train` and `en/test` parquet files directly. That test parquet has 2,185 rows, while MTEB metadata lists 4,386, so absolute MTOPIntent accuracy is not directly comparable with the MTEB leaderboard. Relative performance is unaffected because full and truncated use the same split.
 - `mteb/banking77` currently has 3,076 test rows (MTEB lists 3,080).
 - The plan said to encode on the local GPU. The user asked to use the course HPC instead. Its only partition open to our account (`gpu_rtx_pro_6000_6_csis_hyd`) had all 5 GPUs held by multi day jobs, with an estimated start the next day; CPU jobs are capped at 4 cores by the course QOS, and the compute nodes have Python 3.6 only. We therefore encoded locally on the RTX 4060 Laptop GPU in fp16, throttled to a 50% duty cycle at below normal priority because the GPU was in use for other work. Throughput numbers in `results/e0_encoding_times.csv` include that throttle.
-- All cached experiments ran on CPU (16 cores, 6 parallel workers at below normal priority) so the local GPU stayed free.
+- Cached experiments run on CPU by default (`TRUNBED_DEVICE=cpu`). During development some scripts were also run on the GPU; CPU and GPU float arithmetic differ by up to 2e-4 nDCG@10, which is the same size as the per dimension attribution effects and flips the sign of some near zero deltas. All reported numbers therefore come from one clean `run_all.sh` run on CPU.
+- Joblib parallelism uses the threading backend (`prefer="threads"`), because process workers each load torch and exhausted the Windows commit limit on the 16 GB machine (WinError 1455).
+- E7: a dimension is a tie when |delta| < 1e-9; X1 and X2 set per query deltas below 1e-6 to zero to remove float noise from cosine renormalisation.
+- E7 classification attribution covers 2 models (Para-MiniLM, MPNet) x 2 tasks (Banking77, Emotion), as CLAUDE.md specifies; the paper used 12 tasks and 6 models.
+- E10 is a cross model comparison (n = 6) instead of the paper's within model comparison over training checkpoints; the paper's design needs contrastive retraining of BERT and T5.
+- S1 runs Qwen2.5-0.5B (896 hidden dims) instead of Qwen2.5-7B and Llama 3.1 8B, on 200 HellaSwag validation items, 200 MMLU test items (0-shot, letter log likelihood) and 50 GSM8K test items (5-shot with the first 5 training items as shots, greedy, max 256 new tokens, strict match on `#### N`), sampled with seed 0. It does not use lm-evaluation-harness; scoring is our own. The final normed hidden state and the matching columns of the untied unembedding are sliced. It ran unthrottled on the local RTX 4060 Laptop GPU in fp16.
+- The demo shares its logic with the CLI through `demo/core.py`, which is not in the CLAUDE.md layout. Full PCA fits per model are cached in `cache/pca/` and sliced for each K.
+
+## Runtimes
+
+| Step | Hardware | Time |
+|---|---|---|
+| Encoding, 6 models x 166,078 texts | RTX 4060 Laptop, fp16, 50% duty | 49 min in total (2 to 14 min per model) |
+| E1 retrieval, 6 models x 13 datasets x 110 settings | CPU | about 2 min |
+| E1 classification, 6 models x 4 tasks x 100 settings x 10 LR fits | CPU, 8 threads | about 55 min |
+| E7 retrieval attribution, 4 models | CPU | about 1.5 min |
+| E7 classification attribution, 2 models x 2 tasks | CPU, threads | about 25 min |
+| X1, X2, X3 | CPU | about 2, 1, 4 min |
+| S1, 3 variants x 450 items | RTX 4060 Laptop, fp16 | about 30 min |
+| Full `run_all.sh` from cache | CPU | about 1.5 h |
+
+## Known weaknesses of our setup
+
+- 4 of 12 MTEB classification tasks and NanoBEIR (50 queries per dataset) instead of full BEIR, so per dataset numbers are noisy; X2 shows the query level standard error of the NanoBEIR mean is 0.012.
+- E5-base-v2 stands in for E5-large; its PCA result (101.7%) differs from the paper's E5-large (90.6%), so E5 comparisons are only indicative.
+- MTEB few shot protocol (8 to 32 examples per label) makes classification accuracy noisy; our relative classification numbers are 0.6 to 2.3 points below the paper's.
+- Cross model correlations in E10 and X3 use n = 6 models and are dominated by Contriever.
+- The X3 theory ignores renormalisation after truncation and underpredicts E5's rank stability (0.79 vs 0.88).
+- MTOPIntent test split is smaller than MTEB's (2,185 vs 4,386 rows).
 - Added `src/evaluate.py` (shared retrieval and classification evaluators) and `src/paper.py` (paper reference numbers) to the layout in CLAUDE.md, so every script and the demo compare against one source of truth.

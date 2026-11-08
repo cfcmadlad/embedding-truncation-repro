@@ -12,7 +12,7 @@ from src.attribution import corr_mean, isoscore, uniformity
 from src.encode import MODELS, load_emb
 from src.plotting import MODEL_COLORS, RES_DIR, figure, legend_outside, save
 
-METRICS = {"isoscore": "IsoScore (higher = more isotropic)", "uniformity": "Uniformity loss (lower = more uniform)", "corr_mean": "Mean |inter-dim correlation|"}
+METRICS = {"isoscore": "IsoScore", "uniformity": "Uniformity loss", "corr_mean": "Mean |inter-dim corr|"}
 TARGETS = {"rel50_last": "last", "rel50_random": "random"}
 
 
@@ -50,12 +50,13 @@ def main() -> None:
             ax.scatter(r[metric], r.rel50_random * 100, s=140, facecolors="none", edgecolors=MODEL_COLORS[r.model], linewidths=2.5)
         rl = cdf[(cdf.metric == metric) & (cdf.target == "rel50_last")].pearson.iloc[0]
         rr = cdf[(cdf.metric == metric) & (cdf.target == "rel50_random")].pearson.iloc[0]
-        ax.set_xlabel(f"{name}\nPearson r: last {rl:.2f}, random {rr:.2f}", fontsize=16)
+        ax.set_xlabel(f"{name}\nr = {rl:.2f} / {rr:.2f}", fontsize=16)
     axes[0].set_ylabel("Relative nDCG@10 at 50% removed (%)")
     handles, names = axes[0].get_legend_handles_labels()
     handles.append(axes[0].scatter([], [], s=140, color="black"))
     handles.append(axes[0].scatter([], [], s=140, facecolors="none", edgecolors="black", linewidths=2.5))
-    names += ["Filled: last-K", "Hollow: random-K"]
+    handles.append(axes[0].scatter([], [], s=0))
+    names += ["Filled: last-K", "Hollow: random-K", "r = last / random"]
     legend_outside(axes[2], handles=handles, labels=names)
     save(fig, "fig_anisotropy_vs_drop")
 

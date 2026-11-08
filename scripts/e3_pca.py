@@ -20,6 +20,9 @@ from src.plotting import MODEL_COLORS, RES_DIR, figure, figure_legend, save
 from src.truncate import pca_apply, pca_fit
 
 
+SHORT = {"minilm": "MiniLM", "mpnet": "MPNet", "contriever": "Contriever", "e5": "E5"}
+
+
 def pca_for(model: str) -> tuple[np.ndarray, np.ndarray]:
     return pca_fit(load_emb(model, "allnli", "all"), MODELS[model].dim // 2)
 
@@ -77,7 +80,7 @@ def main() -> None:
         for off, kind, hatch in [(-0.2, "trunc", ""), (0.2, "pca", "//")]:
             ax.bar(x + off, plot_df[f"{bench}_{kind}"], 0.38, color=[MODEL_COLORS[m] for m in plot_df.model], hatch=hatch, edgecolor="black")
             ax.scatter(x + off, plot_df[f"paper_{bench}_{kind}"], marker="*", s=300, color="black", zorder=5)
-        ax.set_xticks(x, [MODELS[m].label.replace(" ", "\n", 1) for m in plot_df.model])
+        ax.set_xticks(x, [SHORT[m] for m in plot_df.model], rotation=20)
         ax.set_xlabel(label)
         ax.set_ylim(60, 105)
     axes[0].set_ylabel("Relative performance at 50% (%)")

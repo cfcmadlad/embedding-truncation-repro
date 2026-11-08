@@ -26,7 +26,7 @@ def main() -> None:
                 ax.errorbar(100 * s.frac, s.rel_mean, yerr=s.rel_std, color=MODEL_COLORS[model], ls=ls, marker="o", capsize=3,
                             label=f"{MODELS[model].label}, {'last' if method == 'last' else 'random'}-K")
         ax.set_xlabel(f"K% removed (%), {'NanoBEIR' if task == 'retrieval' else 'MTEB'}")
-        ax.set_xticks(range(0, 100, 10))
+        ax.set_xticks(range(0, 100, 20))
     axes[0].set_ylabel("Relative performance (%)")
     handles, labels = axes[0].get_legend_handles_labels()
     save(fig, "fig_mrl", rect=figure_legend(fig, handles, labels, right=0.68))
