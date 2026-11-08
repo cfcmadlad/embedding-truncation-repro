@@ -180,7 +180,13 @@ Other results: `e0_*` (full scores, encoding times, metric check), `e1_*` (all t
 
 ## 11. Limitations
 
-Four of twelve MTEB tasks, 50 queries per NanoBEIR dataset, a base sized stand in for E5-large, a 0.5B model for the LLM experiment, and cross model correlations over only 6 models. Details and further weaknesses are listed in [REPRO_NOTES.md](REPRO_NOTES.md).
+- Four of the twelve MTEB classification tasks are used, and NanoBEIR (50 queries per dataset) replaces full BEIR.
+- E5-base-v2 stands in for E5-large; E5-Mistral (7B) and Sentence-T5 are not included.
+- The LLM experiment uses Qwen2.5-0.5B instead of Qwen2.5-7B and Llama 3.1 8B.
+- The anisotropy analysis compares 6 trained models instead of retraining BERT and T5 and tracking checkpoints.
+- Cross model correlations rest on only 6 models.
+
+The 7B to 8B models and the retraining experiment need more GPU memory than the 8 GB laptop GPU used here. The course HPC was considered for them, but on the run date the course account was limited to a shared half of one GPU (Slurm QOS `gres/gpu=0`, `mps=50`, 4 CPUs, 80 GB RAM), all five GPUs of the only partition open to it were allocated to multi day jobs, and 22 jobs were queued ahead. These experiments are therefore left as future work. Details and further weaknesses are listed in [REPRO_NOTES.md](REPRO_NOTES.md).
 
 ## 12. Hardware
 

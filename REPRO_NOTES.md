@@ -120,4 +120,5 @@ Paper: Takeshita et al., "Randomly Removing 50% of Dimensions in Text Embeddings
 - Cross model correlations in E10 and X3 use n = 6 models and are dominated by Contriever.
 - The X3 theory ignores renormalisation after truncation and underpredicts E5's rank stability (0.79 vs 0.88).
 - MTOPIntent test split is smaller than MTEB's (2,185 vs 4,386 rows).
+- E5-Mistral (7B), Sentence-T5, E5-large, the remaining 8 MTEB tasks, the 7B to 8B LLMs and the BERT/T5 retraining were planned as an HPC extension. On 8 Nov 2026 at 14:30 the course QOS (`gpu_csis_course`) allowed no full GPU per job (`gres/gpu=0`), only a half GPU MPS share, 4 CPUs and 80 GB RAM; all 5 GPUs of `gpu_rtx_pro_6000_6_csis_hyd` were allocated to other users' multi day jobs and 22 jobs were pending. The extension was dropped and is left as future work.
 - Added `src/evaluate.py` (shared retrieval and classification evaluators) and `src/paper.py` (paper reference numbers) to the layout in CLAUDE.md, so every script and the demo compare against one source of truth.
