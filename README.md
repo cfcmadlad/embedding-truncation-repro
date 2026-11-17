@@ -12,9 +12,18 @@ This repository re-tests the paper's central claim **live, on your own laptop CP
 | **What the demo does** | Encodes real data with a real encoder, deletes dimensions, measures the quality and prints it next to the paper's numbers, followed by a one-line verdict. |
 | **Time and hardware** | About 1 minute, CPU only, no GPU, no large download (a 70 MB zip). |
 
+## Quick start in four lines
+
+1. Download `embedding-truncation-lite.zip` from the [`lite-v1` release](https://github.com/cfcmadlad/embedding-truncation-repro/releases/tag/lite-v1) and unzip it.
+2. Open a terminal in the unzipped folder `embedding-truncation-lite`.
+3. Run `.un.bat` on Windows or `./run.sh` on macOS and Linux. The very first call installs the packages (5 to 8 minutes, internet needed once); every later call takes about a minute and works offline.
+4. Read the last lines: they end with `VERDICT  the paper's claim holds in this live run.`
+
+Everything is explained step by step in [Part 1](#part-1-run-the-demo); the presenter's 90-second script is in [docs/RUN_SHEET.md](docs/RUN_SHEET.md).
+
 ## Contents
 
-- [Part 1. Run the demo](#part-1-run-the-demo): requirements, step-by-step commands, what you will see, fixing problems, the optional Streamlit demo
+- [Part 1. Run the demo](#part-1-run-the-demo): what you will see, requirements, step-by-step commands, fixing problems, where it was tested, the optional Streamlit demo
 - [Part 2. The paper explained in detail](#part-2-the-paper-explained-in-detail)
 - [Part 3. Our reproduction](#part-3-our-reproduction): results, scope, method, layout, reproducing everything
 
@@ -43,7 +52,7 @@ Everything is computed on your machine. The encoder is a small model whose weigh
 |---|---|
 | Operating system | Windows 10 or 11, macOS, or Linux |
 | Python | 3.10, 3.11, 3.12 or 3.13. Check with `python --version` (on Windows also try `py --version`). If it is missing, install Python 3.12 from [python.org](https://www.python.org/downloads/) and tick **Add python.exe to PATH** on Windows |
-| Disk | about 3 GB free (packages 2.5 GB, kit 0.1 GB) |
+| Disk | about 2 GB free (the private Python environment is about 1.5 GB, the kit 0.1 GB) |
 | Internet | once, for installing the packages (5 to 8 minutes). Do this at home, not in the exam room |
 | GPU | not used |
 
@@ -78,7 +87,9 @@ chmod +x run.sh
 
 What happens: the first call creates a private environment `.venv` in the folder and installs the packages from `requirements-demo.txt`. It prints `Installing dependencies once...` and then stays quiet for 5 to 8 minutes. Later calls skip this and start immediately. Nothing is installed outside the folder.
 
-**Step 5. Read the output.** After the installation the live run starts and takes about a minute. Annotated:
+On Windows you can also **double-click `run.bat`** in File Explorer: the window stays open at the end ("Press any key") so the output can be read. On a PC with fewer than 4 CPU cores the launcher switches to the fast mode by itself and says so; add `--full` to force the full run.
+
+**Step 5. Read the output.** After the installation the live run starts and takes about a minute (up to 90 s on a busy or slower machine). Annotated:
 
 ```
 model      sentence-transformers/paraphrase-MiniLM-L3-v2 (384 dimensions, cos similarity)   <- the encoder
@@ -118,11 +129,11 @@ The last digit can differ by a few thousandths on another CPU. The verdict does 
 | Command | What it does | Time |
 |---|---|---|
 | `.\run.bat` | the full live run described above | about 1 minute |
-| `.\run.bat fast` | cuts the corpus to 400 documents (all judged ones kept); add `--threads 1` for a slow CPU | 35 to 60 s |
+| `.\run.bat fast` | cuts the corpus to 400 documents (all judged ones kept); add `--threads 1` for a slow CPU | 35 to 65 s |
 | `.\run.bat replay` | prints the stored result of an earlier run, labelled as stored | 1 s |
 | `.\run.bat check` | prints `ok` or `FAIL` for Python, packages, model, data and a smoke run | 20 s |
 | `.\run.bat selfcheck` | runs all of the above and writes `selfcheck_report_<host>.txt` to send back | 3 minutes |
-| `.\run.bat test` | runs the 25 automated tests | 10 s |
+| `.\run.bat test` | runs the automated tests (25; 2 are skipped without the full cache and pytrec_eval) | 10 s |
 
 Examples: `.\run.bat fast --threads 1`, `.\run.bat check`.
 
@@ -158,7 +169,20 @@ cd embedding-truncation-repro
 python scripts/fetch_lite.py
 ```
 
-## 1.5 Optional: the interactive Streamlit demo
+## 1.5 Where this has been tested
+
+| Environment | Result |
+|---|---|
+| Windows 11, Python 3.13, fresh environment, kit unzipped into a folder with spaces in its name | install, `check` all ok, live run 48 to 60 s |
+| Windows 11, Python 3.12.4, installed through `run.bat` behind antivirus HTTPS scanning | install succeeded after the automatic retry, live run 48 s |
+| Windows 11, Python 3.10.21 | `check` ok, 24 tests pass, live run 45 s, `fast --threads 1` 34 s |
+| Same kit, no internet (dead proxy), empty Hugging Face cache | live run 60 s, correct verdict, nothing downloaded |
+| Encoder files hidden (simulated broken install), 5 times | error line, then the stored table labelled `STORED RESULT, NOT RECOMPUTED`, 15 to 22 s |
+| 5 full rehearsals, GPU hidden with `CUDA_VISIBLE_DEVICES=-1` | identical numbers every time, 48 to 55 s |
+
+All of these ran on one Windows laptop (8 physical cores). macOS, Linux, Python 3.11 and machines with fewer cores are expected to work (the launcher, the version ranges and the automatic fast mode are written for them) but have not been run by us; the `selfcheck` mode exists so that any machine can prove it in 3 minutes ([docs/SELF_CHECK.md](docs/SELF_CHECK.md)).
+
+## 1.6 Optional: the interactive Streamlit demo
 
 The Streamlit app lets you pick any of 6 models, 17 datasets and 5 truncation methods with a slider. It needs the **full embedding cache** (1.7 GB download, 2.7 GB unpacked) and Python 3.12 or newer. It is not needed for the live run.
 

@@ -10,11 +10,13 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from src.runtime import force_cpu, setup_console, threads
+from src.runtime import force_cpu, physical_cores, setup_console, threads
 
 BOOT = time.perf_counter()
 setup_console()
 force_cpu()
+if "--replay" not in sys.argv:
+    print("starting: loading libraries and the encoder, about 15 s, then the live run", flush=True)
 
 import numpy as np
 import torch
@@ -109,6 +111,7 @@ def main() -> None:
     ap.add_argument("--task", default="Banking77", choices=list(CLASSIFICATION))
     ap.add_argument("--max-docs", type=int, default=None)
     ap.add_argument("--fast", action="store_true")
+    ap.add_argument("--full", action="store_true")
     ap.add_argument("--no-classification", action="store_true")
     ap.add_argument("--threads", type=int, default=None)
     ap.add_argument("--replay", action="store_true")
@@ -116,6 +119,9 @@ def main() -> None:
     if args.replay:
         replay(args, "replay requested")
         return
+    if not args.fast and not args.full and not args.max_docs and physical_cores() < 4:
+        args.fast = True
+        print(f"note       only {physical_cores()} CPU cores found, so --fast is used to stay near one minute (add --full to override)")
     if args.threads:
         os.environ["TRUNBED_THREADS"] = str(args.threads)
     torch.set_num_threads(threads())

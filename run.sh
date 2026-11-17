@@ -14,7 +14,7 @@ if [ ! -x ".venv/bin/python" ]; then
     python3 -m venv .venv && found="python3"
   fi
   if [ -z "$found" ]; then
-    echo "FAIL: no Python 3.10 to 3.13 found. Install Python 3.12 and run again."
+    echo "FAIL: no Python 3.10 to 3.13 found. Install Python 3.12 (macOS: brew install python@3.12, Linux: sudo apt install python3.12 python3.12-venv) and run again."
     exit 1
   fi
 fi

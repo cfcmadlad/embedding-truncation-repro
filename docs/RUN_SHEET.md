@@ -2,6 +2,16 @@
 
 The instructor asked for a small version of the code run live on a subset of the data, showing the essence of the paper. The essence is one claim: removing a random half of the dimensions of a text embedding costs little. The live run tests that claim in front of the audience, on the laptop's CPU, in about a minute.
 
+## The 90-second version (for anyone who has to present)
+
+1. Open the unzipped folder `embedding-truncation-lite` in a terminal (Windows: type `cmd` in the folder's address bar).
+2. Type `.un.bat` (macOS or Linux: `./run.sh`) and press Enter. On Windows double-clicking `run.bat` also works.
+3. Say while it runs (about 50 to 60 s): "The paper claims you can delete a random half of an embedding and keep over 90% of retrieval quality and over 95% of classification accuracy. We are testing that now, live, on this laptop: it encodes 3,000 real texts, deletes dimensions, and compares with the paper's own curve."
+4. When the table appears, point at the 50% row: "`kept` is 94.2%, the paper says 94.6%." Point at the last lines: retrieval 94.2%, classification 97.7%, then the `VERDICT` line.
+5. If anything fails, the script shows the stored result labelled `STORED RESULT, NOT RECOMPUTED`: say so, and read the same table.
+
+The first call on a new machine installs packages and needs internet (5 to 8 minutes), so do it beforehand.
+
 ## Before the day (once, with good internet)
 
 1. Unzip `embedding-truncation-lite.zip` (or clone the repo and run `python scripts/fetch_lite.py`).
