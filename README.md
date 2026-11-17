@@ -1,48 +1,64 @@
-# Random Truncation of Text Embeddings: a Reproduction
-
-An independent, scoped reproduction of
-
-> Sotaro Takeshita, Yurina Takeshita, Daniel Ruffinelli and Simone Paolo Ponzetto. *Randomly Removing 50% of Dimensions in Text Embeddings has Minimal Impact on Retrieval and Classification Tasks.* EMNLP 2025.
+# Random Truncation of Text Embeddings: a Live Demo and Reproduction
 
 CS F429 (Introduction to NLP), BITS Pilani Hyderabad, Group 12, paper 14.
 
-The repository contains our own implementation of every truncation method, metric, attribution analysis and evaluation in the paper, three extension experiments that test the paper's explanation, an interactive demo, and a **live run that re-tests the paper's core claim on your own CPU in about a minute**.
+> Sotaro Takeshita, Yurina Takeshita, Daniel Ruffinelli and Simone Paolo Ponzetto. *Randomly Removing 50% of Dimensions in Text Embeddings has Minimal Impact on Retrieval and Classification Tasks.* EMNLP 2025 ([arXiv 2508.17744](https://arxiv.org/abs/2508.17744), PDF in `docs/paper.pdf`).
+
+This repository re-tests the paper's central claim **live, on your own laptop CPU, in about a minute**, and contains the full reproduction behind it.
 
 | | |
 |---|---|
-| **Core claim** | Removing a random 50% of the dimensions of a text embedding keeps more than 90% of retrieval quality and more than 95% of classification accuracy. |
-| **Reproduced** | Yes: 88.7 to 98.3% (retrieval) and 93.1 to 97.0% (classification) across our encoders; the paper reports 87.3 to 97.7% and 95.4 to 97.7%. |
-| **Our extensions** | The paper's explanation (many "degrading" dimensions) does not survive a held-out test; a sampling argument explains the robustness instead. |
-| **Live run** | `run.bat` or `./run.sh`: encodes NanoSciFact and Banking77 live with MiniLM on a CPU, prints the truncation table next to the paper's numbers and a verdict. |
+| **The claim** | Deleting a random half of the numbers in a text embedding keeps more than 90% of retrieval quality and more than 95% of classification accuracy. |
+| **What the demo does** | Encodes real data with a real encoder, deletes dimensions, measures the quality and prints it next to the paper's numbers, followed by a one-line verdict. |
+| **Time and hardware** | About 1 minute, CPU only, no GPU, no large download (a 70 MB zip). |
 
 ## Contents
 
-1. [Quick start](#1-quick-start): [lite kit](#1a-lite-kit-the-live-run) (live run) and [full cache](#1b-full-cache-streamlit-demo-and-all-experiments) (demo and all experiments)
-2. [The paper in brief](#2-the-paper-in-brief)
-3. [What this repository reproduces](#3-what-this-repository-reproduces)
-4. [Headline results](#4-headline-results)
-5. [Scope](#5-scope)
-6. [Method and implementation](#6-method-and-implementation)
-7. [Repository layout](#7-repository-layout)
-8. [Reproducing all results](#8-reproducing-all-results)
-9. [Outputs](#9-outputs)
-10. [Key design decisions](#10-key-design-decisions)
-11. [Limitations](#11-limitations)
-12. [Hardware](#12-hardware)
+- [Part 1. Run the demo](#part-1-run-the-demo): requirements, step-by-step commands, what you will see, fixing problems, the optional Streamlit demo
+- [Part 2. The paper explained in detail](#part-2-the-paper-explained-in-detail)
+- [Part 3. Our reproduction](#part-3-our-reproduction): results, scope, method, layout, reproducing everything
 
-Further documents: [RESULTS.md](RESULTS.md) (every claim, our number and the paper's), [REPRO_NOTES.md](REPRO_NOTES.md) (scope, protocol, deviations, audit), [docs/RUN_SHEET.md](docs/RUN_SHEET.md) (live demo script), [docs/VIVA.md](docs/VIVA.md) (questions and answers), [docs/SELF_CHECK.md](docs/SELF_CHECK.md) (5-minute check for a teammate's laptop).
+---
 
-## 1. Quick start
+# Part 1. Run the demo
 
-There are two ways to run this repository. The lite kit runs the paper's core experiment live on your own CPU in about a minute and needs no large download. The full cache (1.7 GB) is only needed for the Streamlit demo and for regenerating every result.
+## 1.1 What you will see
 
-### 1a. Lite kit: the live run
+```mermaid
+flowchart LR
+    A["50 queries and 2,919 abstracts<br/>(NanoSciFact)"] --> B["Encode live on the CPU<br/>with MiniLM, 384 numbers per text"]
+    B --> C["Delete the last K% or a random K%<br/>of the 384 numbers, K = 0 to 90"]
+    C --> D["Search again and score<br/>with nDCG@10"]
+    D --> E["Table: our score next to<br/>the paper's curve"]
+    F["Banking77 customer questions"] --> G["Same deletion, then a<br/>logistic regression classifier"]
+    G --> E
+    E --> H["VERDICT line"]
+```
 
-**What it is.** `scripts/live_small.py` encodes NanoSciFact (50 queries, 2,919 documents) with `paraphrase-MiniLM-L3-v2` on the CPU, removes the last K% and a random K% (10 seeds) of the dimensions for K = 0 to 90, and prints nDCG@10 next to the paper's Figure 1 average. It also checks that removing and zeroing dimensions give the same score, and repeats the experiment for classification on Banking77. It ends with a one-line verdict. No GPU is used.
+Everything is computed on your machine. The encoder is a small model whose weights ship inside the zip (`lite/models/minilm`), so no internet is needed after the one-time installation.
 
-**Requirements.** Python 3.10 to 3.13 (check with `python --version`), 3 GB of free disk space for the packages, and internet once to install them. After that the live run works offline.
+## 1.2 Requirements
 
-**Option A: download the zip (recommended).** Download `embedding-truncation-lite.zip` (about 70 MB) from the [`lite-v1` release](https://github.com/cfcmadlad/embedding-truncation-repro/releases/tag/lite-v1) (or copy it from a USB stick), unzip it, open a terminal in the unzipped folder `embedding-truncation-lite` and run:
+| Item | Needed |
+|---|---|
+| Operating system | Windows 10 or 11, macOS, or Linux |
+| Python | 3.10, 3.11, 3.12 or 3.13. Check with `python --version` (on Windows also try `py --version`). If it is missing, install Python 3.12 from [python.org](https://www.python.org/downloads/) and tick **Add python.exe to PATH** on Windows |
+| Disk | about 3 GB free (packages 2.5 GB, kit 0.1 GB) |
+| Internet | once, for installing the packages (5 to 8 minutes). Do this at home, not in the exam room |
+| GPU | not used |
+
+## 1.3 Step by step
+
+**Step 1. Download the kit.** Open the [`lite-v1` release](https://github.com/cfcmadlad/embedding-truncation-repro/releases/tag/lite-v1) and download `embedding-truncation-lite.zip` (70 MB). A USB stick copy works the same way.
+
+**Step 2. Unzip it.** Windows: right click the zip, choose *Extract All*. macOS: double click. Linux: `unzip embedding-truncation-lite.zip`. You get a folder `embedding-truncation-lite`. Folder names with spaces are fine.
+
+**Step 3. Open a terminal inside that folder.**
+- Windows: open the folder in File Explorer, click the address bar, type `cmd`, press Enter.
+- macOS: right click the folder, *New Terminal at Folder* (or open Terminal and `cd` into it).
+- Linux: open a terminal and `cd embedding-truncation-lite`.
+
+**Step 4. Run the launcher.**
 
 Windows (Command Prompt or PowerShell):
 
@@ -50,25 +66,85 @@ Windows (Command Prompt or PowerShell):
 .\run.bat
 ```
 
-macOS or Linux:
+macOS or Linux (the first time only, make the script executable):
+
+```bash
+chmod +x run.sh
+```
 
 ```bash
 ./run.sh
 ```
 
-The first call creates `.venv` and installs `requirements-demo.txt` (5 to 8 minutes). Later calls start immediately. Do the first call at home on a good connection, not in the room.
+What happens: the first call creates a private environment `.venv` in the folder and installs the packages from `requirements-demo.txt`. It prints `Installing dependencies once...` and then stays quiet for 5 to 8 minutes. Later calls skip this and start immediately. Nothing is installed outside the folder.
 
-Expected result (the last lines of the output):
+**Step 5. Read the output.** After the installation the live run starts and takes about a minute. Annotated:
 
 ```
+model      sentence-transformers/paraphrase-MiniLM-L3-v2 (384 dimensions, cos similarity)   <- the encoder
+startup    imports and encoder load 12.8 s
+dataset    NanoSciFact: 50 queries, 2919 of 2919 documents                                   <- the data
+encoded    2969 texts live in 25.4 s (117 texts per second, cpu, 8 threads)                  <- live encoding
+full       nDCG@10 0.4713                                                                    <- score with all 384 numbers
+
+ removed    last-K   random-K     std  kept (%)  paper avg (%)
+      0%    0.4713     0.4713  0.0000     100.0          100.0
+     50%    0.4481     0.4438  0.0168      94.2           95.5     <- delete half: 94.2% of the quality is kept
+     90%    0.2637     0.2294  0.0525      48.7           62.0
+
+remove vs zero   ... nDCG@10 0.4447 and 0.4447, largest score difference 4.2e-07   <- deleting equals zeroing
+... Banking77 classification table: 50% removed keeps 97.7% of the accuracy ...
+
 retrieval       random 50% keeps 94.2% of nDCG@10 (paper bar: over 90%, paper Para-MiniLM: 94.6%)
 classification  random 50% keeps 97.7% of accuracy (paper bar: over 95%, paper Para-MiniLM: 97.4%)
 VERDICT  the paper's claim holds in this live run.
 ```
 
-The last decimal can differ by a few thousandths on another CPU. Tested on Windows 11 with Python 3.10, 3.12 and 3.13; macOS and Linux are expected to work but have not been run by us.
+How to read the table:
 
-**Option B: git clone.** The lite files (model weights, data) are not in git; fetch them once:
+| Column | Meaning |
+|---|---|
+| `removed` | percentage of the 384 dimensions deleted |
+| `last-K` | nDCG@10 after deleting the last K% of the dimensions |
+| `random-K` | nDCG@10 after deleting a random K%, averaged over 10 random draws (seeds 0 to 9) |
+| `std` | standard deviation of `random-K` over the 10 draws |
+| `kept (%)` | `random-K` as a percentage of the full score (100 means nothing was lost) |
+| `paper avg (%)` | the paper's own curve (its Figure 1, average of 6 encoders on BEIR), for comparison |
+
+The last digit can differ by a few thousandths on another CPU. The verdict does not change.
+
+**Step 6 (optional). Other modes.** Every mode is `run.bat <mode>` on Windows and `./run.sh <mode>` on macOS or Linux:
+
+| Command | What it does | Time |
+|---|---|---|
+| `.\run.bat` | the full live run described above | about 1 minute |
+| `.\run.bat fast` | cuts the corpus to 400 documents (all judged ones kept); add `--threads 1` for a slow CPU | 35 to 60 s |
+| `.\run.bat replay` | prints the stored result of an earlier run, labelled as stored | 1 s |
+| `.\run.bat check` | prints `ok` or `FAIL` for Python, packages, model, data and a smoke run | 20 s |
+| `.\run.bat selfcheck` | runs all of the above and writes `selfcheck_report_<host>.txt` to send back | 3 minutes |
+| `.\run.bat test` | runs the 25 automated tests | 10 s |
+
+Examples: `.\run.bat fast --threads 1`, `.\run.bat check`.
+
+## 1.4 If something goes wrong
+
+If the live run cannot encode for any reason, it prints the error and then the stored result of an earlier live run, labelled `STORED RESULT, NOT RECOMPUTED`. Say that it is stored; never present it as live.
+
+| Problem | What to do |
+|---|---|
+| `'run.bat' is not recognized` in PowerShell | Type `.\run.bat` with the dot and backslash |
+| `FAIL: no Python 3.10 to 3.13 found` | Install Python 3.12 from python.org, tick **Add python.exe to PATH**, open a new terminal |
+| pip fails with `CERTIFICATE_VERIFY_FAILED` | Antivirus HTTPS scanning. The launcher retries once by itself with certificate checks relaxed for `pypi.org` and `files.pythonhosted.org` only |
+| `permission denied` on macOS or Linux | `chmod +x run.sh` |
+| Windows SmartScreen warns about `run.bat` | *More info*, then *Run anyway*; or run `.venv\Scripts\python scripts\live_small.py` |
+| The output says `STORED RESULT, NOT RECOMPUTED` | Encoding failed. Run `.\run.bat check`, read the `FAIL` line, then `python scripts/fetch_lite.py` (needs internet) |
+| The run takes more than 2 minutes | Close other programs, use `.\run.bat fast --threads 1` |
+| First call looks frozen | It is installing (5 to 8 minutes); wait for the prompt |
+| No internet in the room | Not a problem: after the installation the live run never uses the network |
+
+Before the demo day, run `.\run.bat selfcheck` once on your own laptop and send the report file to the group ([docs/SELF_CHECK.md](docs/SELF_CHECK.md)). The presenter's script with what to say at each step is [docs/RUN_SHEET.md](docs/RUN_SHEET.md).
+
+**Install from git instead of the zip.** The model weights are not stored in git. After cloning, fetch them once, then use the launcher as above:
 
 ```bash
 git clone https://github.com/cfcmadlad/embedding-truncation-repro.git
@@ -82,31 +158,9 @@ cd embedding-truncation-repro
 python scripts/fetch_lite.py
 ```
 
-then run `run.bat` or `./run.sh` as above. `python scripts/fetch_lite.py --zip` builds `dist/embedding-truncation-lite.zip` for the USB stick.
+## 1.5 Optional: the interactive Streamlit demo
 
-**Launcher modes.**
-
-| Command | What it does | Time on a laptop CPU |
-|---|---|---|
-| `run.bat` | full live run: retrieval and classification | about 1 minute |
-| `run.bat fast` | cuts the corpus to 400 documents (all judged ones kept); add `--threads 1` for a slow CPU | about 30 to 60 s |
-| `run.bat replay` | prints the stored csv, labelled as stored | 1 s |
-| `run.bat check` | prints ok or FAIL for Python, packages, files and a smoke run | 20 s |
-| `run.bat selfcheck` | runs all of the above and writes `selfcheck_report_<host>.txt` | 3 minutes |
-| `run.bat test` | pytest | 10 s |
-| `run.bat streamlit` | Streamlit demo (needs the full cache, see 1b) | |
-
-`./run.sh <mode>` takes the same modes. If the live run cannot encode (model files missing, any error), it prints the stored result instead, clearly labelled `STORED RESULT, NOT RECOMPUTED`.
-
-The expected output, step by step, with the sentence to say for each part, is in [docs/RUN_SHEET.md](docs/RUN_SHEET.md). The 5-minute check for a teammate's own laptop is in [docs/SELF_CHECK.md](docs/SELF_CHECK.md).
-
-### 1b. Full cache: Streamlit demo and all experiments
-
-The demo and every experiment run on CPU from precomputed embeddings; no GPU is required. Setup takes about 15 minutes and 6 GB of free disk space.
-
-**Requirements.** Python 3.12 or later (3.13 recommended; the pinned numpy 2.5.2 needs 3.12+) and Git. On Windows, the option "Add python.exe to PATH" must be ticked in the Python installer. The lite kit (1a) is enough for the live run; this section is only for the demo and for regenerating results.
-
-**Step 1. Clone the repository.**
+The Streamlit app lets you pick any of 6 models, 17 datasets and 5 truncation methods with a slider. It needs the **full embedding cache** (1.7 GB download, 2.7 GB unpacked) and Python 3.12 or newer. It is not needed for the live run.
 
 ```bash
 git clone https://github.com/cfcmadlad/embedding-truncation-repro.git
@@ -116,27 +170,21 @@ git clone https://github.com/cfcmadlad/embedding-truncation-repro.git
 cd embedding-truncation-repro
 ```
 
-**Step 2. Create and activate a virtual environment.**
-
 ```bash
 python -m venv .venv
 ```
 
-Windows:
+Activate the environment (Windows, then macOS or Linux):
 
 ```bash
 .venv\Scripts\activate
 ```
 
-macOS or Linux:
-
 ```bash
 source .venv/bin/activate
 ```
 
-The terminal prompt then starts with `(.venv)`. The environment must be activated again in every new terminal before running the commands below.
-
-**Step 3. Install the dependencies.** On a machine without an NVIDIA GPU, the small CPU build of PyTorch is installed first, then the rest:
+Install the packages (CPU build of PyTorch first), download the cache, and check:
 
 ```bash
 pip install torch==2.9.0 --index-url https://download.pytorch.org/whl/cpu
@@ -146,78 +194,303 @@ pip install torch==2.9.0 --index-url https://download.pytorch.org/whl/cpu
 pip install -r requirements.txt
 ```
 
-On a machine with an NVIDIA GPU, the second command alone is sufficient (it installs the CUDA build, about 2.5 GB).
-
-**Step 4. Download the precomputed embeddings.** The embedding cache is too large for git, so it is published as two zip files (1.7 GB in total, 2.7 GB unpacked) on the repository's [`cache-v1` release](https://github.com/cfcmadlad/embedding-truncation-repro/releases/tag/cache-v1). The following command downloads both and unpacks them into `cache/`:
-
 ```bash
 python scripts/fetch_cache.py
 ```
-
-It prints download progress and ends with `cache/ ready`. If the download is interrupted, the same command with `--force` starts it again. Alternatively, `cache_part1.zip` and `cache_part2.zip` can be downloaded from the release page and extracted into the repository folder, so that the file `cache/emb/READY` exists.
-
-**Step 5. Check the setup.** The command below prints full and truncated scores in about a second after the imports:
 
 ```bash
 python scripts/demo_cli.py --model mpnet --dataset NanoSciFact --k 50 --method random --seed 0
 ```
 
-Expected output: full nDCG@10 0.6967, truncated nDCG@10 0.6908, relative 99.15%.
-
-**Step 6. Launch the demo.**
+The last command must print full nDCG@10 0.6967, truncated nDCG@10 0.6908, relative 99.15%. Then start the app (it opens in the browser; first load about 10 s, clicks under 1.5 s):
 
 ```bash
 streamlit run demo/app.py
 ```
 
-The demo opens in the browser. The first load takes about 10 seconds; later interactions take under 1.5 seconds, except that classification with PCA or the degrading and improving methods refits 10 logistic regressions (about 5 s the first time, then cached).
+If port 8501 is busy Streamlit picks 8502 and prints the address. In the sidebar choose the model, dataset, method (last-K, random-K with a seed, PCA, remove degrading, remove improving) and K. The main panel shows the full and truncated score, the relative score, the rank correlation and the curve with the paper's value. The query panel shows the top 5 documents before and after truncation. The second tab shows our three extension experiments. Typing a new query encodes it live and needs that encoder on disk (`python scripts/fetch_lite.py --models mpnet`). Classification with PCA or the degrading and improving methods refits 10 logistic regressions (about 5 s the first time).
 
-### Using the demo
+`demo_cli.py` prints the same numbers without a browser (`--model` minilm, mpnet, contriever, e5, mrl, nonmrl; `--dataset` any NanoBEIR dataset or Banking77, Emotion, TweetSentimentExtraction, MTOPIntent; `--method` last, random, pca, degrading, improving; `--k` 0 to 90; `--seed` 0 to 9).
 
-The sidebar selects the model, the dataset, the truncation method (last-K, random-K with a seed, PCA, remove degrading dimensions, remove improving dimensions) and K, the percentage of dimensions removed. The main panel shows the full and truncated scores (nDCG@10 for retrieval, accuracy for classification), relative performance, the rank correlation between full and truncated rankings, and the truncation curve with the current setting marked against the paper's value. The query panel lists the top 5 documents for a chosen query before and after truncation, with rank changes marked. A new query can also be typed in; this is the only step that runs an encoder, and it needs that encoder on disk because the demo runs with `HF_HUB_OFFLINE=1`: save it once with `python scripts/fetch_lite.py --models mpnet` (any of minilm, mpnet, contriever, e5, mrl, nonmrl), or set `HF_HUB_OFFLINE=0` before launching to let it download from Hugging Face. The second tab, "Critique", shows the leakage, significance and sampling theory results.
+---
 
-### Command line fallback
+# Part 2. The paper explained in detail
 
-The command line tool prints the same numbers as the demo from the cache and is a fallback if the browser app is unavailable (for the same setting it agrees with the live run, for example MiniLM, NanoSciFact, random 50%, seed 0: 0.4447):
+## 2.1 The paper in one minute
 
-```bash
-python scripts/demo_cli.py --model mpnet --dataset NanoSciFact --k 50 --method random --seed 0
+Modern text encoders turn a sentence into a vector of hundreds or thousands of numbers (an *embedding*). Search engines, RAG systems and classifiers all work on these vectors, and storing them is expensive. The paper asks: what happens if we simply throw away some of the numbers? Its surprising answer is that throwing away **a random half** costs very little, for six different encoders and 26 tasks. It then asks *why*, rules out three popular explanations, and proposes its own: the vector contains many "degrading" dimensions that actually hurt performance, so a random cut removes helpful and harmful dimensions in roughly equal numbers.
+
+```mermaid
+flowchart TD
+    Q["Question: how much does an embedding lose when dimensions are deleted?"] --> E1["Experiment 1: delete the last K% or a random K%<br/>6 encoders, 14 retrieval + 12 classification tasks"]
+    E1 --> R1["Finding: random 50% costs under 10% retrieval, under 5% classification"]
+    R1 --> W["Why?"]
+    W --> H1["H1 anisotropy<br/>(vectors in a narrow cone)"]
+    W --> H2["H2 dimensional collapse<br/>(correlated dimensions)"]
+    W --> H3["H3 outlier dimensions<br/>(a few huge values)"]
+    H1 --> N["None of the three explains it"]
+    H2 --> N
+    H3 --> N
+    N --> A["Attribution: remove one dimension at a time"]
+    A --> D["Finding: hundreds of dimensions are degrading,<br/>spread uniformly"]
+    D --> X["Explanation: random deletion removes good and bad dimensions alike"]
+    X --> L["Same pattern, less consistent, in LLM hidden states"]
 ```
 
-| Option | Values |
-|---|---|
-| `--model` | minilm, mpnet, contriever, e5, mrl, nonmrl |
-| `--dataset` | any of the 13 NanoBEIR datasets (for example NanoSciFact, NanoFiQA2018) or a classification task (Banking77, Emotion, TweetSentimentExtraction, MTOPIntent) |
-| `--method` | last, random, pca, degrading, improving |
-| `--k` | percentage of dimensions removed, 0 to 90 |
-| `--seed` | seed for random removal, 0 to 9 |
+## 2.2 Background you need
 
-### Suggested live walkthrough
+**Embedding and similarity.** An encoder maps a text to a vector in R^n (n = 384 for MiniLM, 768 for MPNet, Contriever and Sentence-T5, 1024 for E5-large, 4096 for E5-Mistral). The similarity of a query q and a document d is either the dot product, or the cosine, which divides by the lengths:
 
-1. **Core claim.** MPNet base, NanoSciFact, random-K, K = 50: about 99% of nDCG@10 survives, and the current point lies on the paper's curve.
-2. **The fragile model.** Contriever with K = 80: performance falls much faster, as in the paper.
-3. **Rankings barely change.** In the query panel, the top 5 documents before and after truncation are nearly identical.
-4. **The paper's explanation.** E5, NanoFiQA2018, remove degrading, K = 50: relative nDCG@10 exceeds 100% (108%). The Critique tab then shows that this gain disappears on held out queries (X1) and is not statistically significant (X2).
-5. **Why random removal works.** In the same tab, the sampling theory prediction tracks the observed rank correlation (X3).
+```
+dot(q, d)    = q_1 d_1 + q_2 d_2 + ... + q_n d_n
+cos(q, d)    = dot(q, d) / ( |q| |d| )
+```
 
-### Troubleshooting
+Contriever uses the raw dot product; the other models use cosine.
 
-| Problem | Fix |
-|---|---|
-| `python` is not recognised | Reinstall Python with "Add python.exe to PATH" ticked, or use `py` instead of `python` on Windows |
-| `No matching distribution found for numpy==2.5.2` | The Python version is older than 3.12; install Python 3.12 or later and recreate `.venv` |
-| `FileNotFoundError` mentioning `cache/emb` | Step 4 has not completed; run `python scripts/fetch_cache.py --force` |
-| `streamlit` is not recognised | The virtual environment is not active; run the activation command from Step 2 |
-| `run.bat` says `FAIL: no Python 3.10 to 3.13` | Install Python 3.12 from python.org and tick "Add python.exe to PATH" |
-| pip fails with `CERTIFICATE_VERIFY_FAILED` | Antivirus HTTPS scanning; the launcher retries once with certificate checks relaxed for pypi.org and files.pythonhosted.org only |
-| The live run prints `STORED RESULT, NOT RECOMPUTED` | Encoding failed (model files missing or another error); run `run.bat check`, read the FAIL line, then `python scripts/fetch_lite.py` |
-| Streamlit says the port is in use | Add `--server.port 8600` to the streamlit command |
+**Retrieval and nDCG@10.** Given a query, the system ranks all documents by similarity. The metric nDCG@10 looks only at the top 10 and rewards putting relevant documents high:
 
-## 2. The paper in brief
+```
+DCG@10  = sum over ranks r = 1..10 of  gain(r) / log2(r + 1)
+nDCG@10 = DCG@10 / (DCG@10 of the perfect ranking)          (between 0 and 1)
+```
 
-The paper removes K% of the dimensions of sentence embeddings, either the last K% or a random K%, and measures how much retrieval (nDCG@10) and classification (accuracy) survive. Its main claim is that removing a random half of the dimensions costs less than 10% on retrieval and less than 5% on classification. It then tests three explanations (anisotropy, dimensional collapse, outlier dimensions), rejects all three, and proposes its own: leave-one-dimension-out attribution finds many "degrading" dimensions whose removal improves performance, so random removal discards good and bad dimensions alike.
+The paper uses 14 BEIR datasets (13 NanoBEIR subsets with 50 queries each for E5-Mistral and for the attribution analysis).
 
-## 3. What this repository reproduces
+**Classification.** A logistic regression is trained on the embeddings of a few labelled examples and scored by accuracy on the test set, following the MTEB benchmark (12 tasks in the paper: AmazonCounterfactual, AmazonPolarity, AmazonReviews, Banking77, Emotion, Imdb, MassiveIntent, MassiveScenario, MTOPDomain, MTOPIntent, ToxicConversations, TweetSentimentExtraction).
+
+**Relative performance.** Every curve in the paper divides the score of the truncated embedding by the score of the full embedding:
+
+```
+relative performance (%) = 100 * score(truncated) / score(full)
+```
+
+**Spearman correlation.** Compares two rankings of the same documents (full against truncated embedding). 1 means identical order, 0 means unrelated.
+
+## 2.3 The six encoders
+
+| Encoder | Size | Dimensions | Similarity | What it is |
+|---|---|---|---|---|
+| MPNet base | 109M | 768 | cosine | general sentence encoder |
+| Contriever | 110M | 768 | dot product | unsupervised contrastive retriever, **not normalised** |
+| E5-large | 335M | 1024 | cosine | retrieval encoder trained with `query:` and `passage:` prefixes |
+| E5-Mistral | 7B | 4096 | cosine | LLM-based encoder (the only large one) |
+| Paraphrase-MiniLM | 17M | 384 | cosine | small paraphrase encoder (the one in our live demo) |
+| Sentence-T5 base | 110M | 768 | cosine | T5 encoder |
+
+All six are contrastively trained after pre-training. We reproduce four of them (E5-base-v2 stands in for E5-large) plus a Matryoshka pair; see Part 3.
+
+## 2.4 The two truncation methods
+
+```mermaid
+flowchart LR
+    V["Embedding of n numbers<br/>[v1 v2 v3 ... vn]"] --> L["Last K%<br/>delete the final K% of positions"]
+    V --> R["Random K%<br/>draw K% of positions at random, delete them<br/>repeat 10 times, report mean and std"]
+    L --> S["Similarity computed on the remaining numbers only"]
+    R --> S
+```
+
+A 16-number example with half removed at random: `[v1 . v3 v4 . . v7 . v9 . . v12 v13 . v15 .]` (dots are deleted). Query and document lose the **same** positions, and similarity is computed on the 8 remaining numbers.
+
+The paper removes dimensions instead of setting them to zero, arguing that zeroing "may have varying impact". For the dot product and the cosine this argument is empty: a zero contributes nothing to the dot product or to the length, exactly like a missing number, so both give identical scores. We verified this to 1e-13 (and the demo prints it).
+
+## 2.5 Result 1: random truncation barely hurts
+
+Retrieval and classification keep most of their quality even when half the dimensions are gone, and the curves for last-K and random-K look alike. Only at 80 to 90% removal does quality collapse (last-K stays above 80% up to 80% removal for five of six encoders; E5-Mistral keeps 90% of its quality even with 90% removed). Contriever is the most fragile model, especially on retrieval. The 10 random draws give small standard deviations, so the result does not depend on which dimensions are drawn; Appendix Fig 7 repeats the picture for three differently seeded training runs.
+
+Paper Table 2 (relative performance at 50% random removal, %):
+
+| Encoder | BEIR random | MTEB random |
+|---|---|---|
+| MPNet | 97.7 | 96.6 |
+| Contriever | 87.3 | 95.4 |
+| E5-large | 95.9 | 97.7 |
+| E5-Mistral (NanoBEIR) | 99.6 | 98.2 |
+| Paraphrase-MiniLM | 94.6 | 97.4 |
+| Sentence-T5 | 95.9 | 97.8 |
+
+Our reproduction of the curve (Fig 2c and 2d of the paper), per model, 10 seeds, with the paper's average as the dashed line:
+
+![Our reproduction: random truncation, retrieval](figures/fig_trunc_retrieval.png)
+
+![Our reproduction: random truncation, classification](figures/fig_trunc_classification.png)
+
+## 2.6 Do the rankings survive? (Spearman, Fig 8)
+
+For each query the paper ranks all documents with the full embedding and with the truncated one and computes the Spearman correlation. At 50% last-K removal it stays above 0.8 for all models (E5-Mistral about 0.95, Sentence-T5 0.92, MPNet 0.90, E5-large 0.88, MiniLM 0.88, Contriever 0.85). At 90% it drops to 0.43 (Contriever) to 0.74 (E5-Mistral). So truncation preserves the geometry of the space well enough that retrieval and classification mostly do not notice.
+
+![Our reproduction of Fig 8: Spearman correlation between full and truncated rankings](figures/fig_spearman.png)
+
+## 2.7 Why does it work? Three hypotheses that fail
+
+The intuition: if the encoder uses its space efficiently, deleting dimensions should hurt a lot. So perhaps the encoder uses its space inefficiently. The paper tests three ways in which that could be true.
+
+```mermaid
+flowchart TD
+    subgraph H1["Section 3.1 Anisotropy"]
+    a1["Train BERT and T5 contrastively on SNLI + MultiNLI with InfoNCE,<br/>save checkpoints"] --> a2["Measure uniform loss and IsoScore<br/>at each checkpoint"]
+    a2 --> a3["Correlate with relative performance at 50% last-K"]
+    end
+    subgraph H2["Section 3.2 Dimensional collapse"]
+    b1["Mean correlation between dimensions (Corr Mean)<br/>on 10K simple-wiki paragraphs"] --> b2["Correlate with relative performance at 50%"]
+    end
+    subgraph H3["Section 3.3 Outlier dimensions"]
+    c1["Average all NanoBEIR query embeddings,<br/>dimensions beyond 3 sigma are outliers"] --> c2["Remove them, compare with removing the same<br/>number of non-outliers (10 draws)"]
+    end
+```
+
+**Anisotropy (3.1).** Anisotropic embeddings sit in a narrow cone and use the space unevenly. As contrastive training proceeds, anisotropy falls and full-size performance rises, but the relative performance of half-size embeddings stays flat (T5 98 to 102%, BERT 94.5 to 98%). Pearson correlations with relative performance are weak: T5 uniform loss 0.36 and IsoScore -0.47; BERT uniform loss -0.35 and IsoScore 0.39.
+
+**Dimensional collapse (3.2).** If many dimensions are correlated, deleting some should lose little. The paper measures the mean correlation between dimensions over training checkpoints and finds no clear relation (Pearson 0.45 for T5, -0.30 for BERT).
+
+**Outlier dimensions (3.3).** Following Kovaleva et al., a few dimensions with huge values could dominate. The paper finds 1 to 5 such dimensions per model (32 for E5-Mistral) and shows removing them changes nDCG@10 no more than removing random dimensions, except for E5-Mistral:
+
+| Model | # outliers | Without outliers | Without random non-outliers |
+|---|---|---|---|
+| MPNet | 5 | 0.576 | 0.576 ± 9e-4 |
+| Contriever | 3 | 0.525 | 0.524 ± 1e-3 |
+| E5-large | 1 | 0.577 | 0.577 ± 4e-4 |
+| E5-Mistral | 32 | 0.651 | 0.626 ± 6e-4 |
+| Paraphrase-MiniLM | 2 | 0.483 | 0.483 ± 6e-4 |
+| Sentence-T5 | 2 | 0.489 | 0.489 ± 9e-4 |
+
+![Our reproduction of Table 1: removing outlier dimensions against random dimensions](figures/fig_outliers.png)
+
+## 2.8 The paper's own explanation: degrading dimensions
+
+**Attribution method (Section 4).** Remove one dimension at a time and re-evaluate. If the score goes **up** when dimension i is removed, dimension i is *degrading*; if it goes down, it is *improving*; if unchanged, a *tie*. This is done on 13 NanoBEIR datasets and 12 MTEB datasets for all 6 models.
+
+```mermaid
+flowchart LR
+    F["Full embedding: score S"] --> I["For each dimension i"]
+    I --> RM["Remove only dimension i,<br/>re-score: S_i"]
+    RM --> C{"S_i compared with S"}
+    C -->|"S_i > S"| DG["degrading (blue)"]
+    C -->|"S_i < S"| IM["improving (orange)"]
+    C -->|"equal"| T["tie"]
+```
+
+**Finding 1 (Fig 4).** In every model and benchmark an astonishing number of dimensions are degrading, in some cases more than half. Examples (degrading / improving / tie): MPNet on NanoBEIR 595 / 169 / 4; Contriever 498 / 270 / 0 (65% degrading on NanoBEIR, 52% on MTEB); E5-large on MTEB 430 / 594 / 0 of 1024; E5-Mistral on NanoBEIR 2652 / 1419 / 25; MiniLM 117 / 267 / 0. The individual effects are tiny, of order 1e-3 nDCG or less. The degrading dimensions look uniformly spread over the vector, not clustered.
+
+![Our reproduction of Fig 4 for MPNet: each point is the score without one dimension](figures/fig_attribution_mpnet.png)
+
+**Finding 2 (Fig 5, Fig 12).** Remove only the degrading dimensions, strongest first: performance rises above 100% for Sentence-T5 (about 103%), E5-large, E5-Mistral (about 102%) and Paraphrase-MiniLM, and decays more slowly than last-K for Contriever and MPNet. Remove only the improving dimensions and performance falls faster than last-K.
+
+![Our reproduction of Fig 5 and 12: removing degrading, improving and last dimensions](figures/fig_degrading_removal.png)
+
+**The explanation.** A random cut removes about as many helpful as harmful dimensions; their effects roughly cancel, so the loss is small.
+
+**Finding 3 (Fig 6): shared degrading dimensions.** Degrading dimensions are found separately for each of the 13 NanoBEIR datasets and counted across datasets. No dimension is degrading on all 13 datasets, but many are degrading on several: for MPNet more than 20% of the dimensions degrade on five datasets. This hints at domain-specific methods to find them.
+
+![Our reproduction of Fig 6: how many dimensions are degrading on k datasets](figures/fig_shared_degrading.png)
+
+**Outlier degrading dimensions in E5-Mistral (Fig 13).** 19 degrading dimensions have a much larger effect than the rest (beyond 3 sigma), and 12 of them are also value outliers. This may explain why E5-Mistral keeps 90% of its quality at 90% removal.
+
+## 2.9 Random truncation against PCA
+
+PCA (scikit-learn, fitted on 20,000 sentences of all-nli) keeps the 50% directions with most variance. It needs fitting and extra computation; random truncation needs nothing. Table 2 (relative performance at 50%, %):
+
+| Encoder | BEIR random | BEIR PCA | MTEB random | MTEB PCA |
+|---|---|---|---|---|
+| MPNet | 97.7 | 99.4 | 96.6 | 99.6 |
+| Contriever | 87.3 | **77.3** | 95.4 | 98.5 |
+| E5-large | 95.9 | **90.6** | 97.7 | 99.8 |
+| E5-Mistral | 99.6 | 100.6 | 98.2 | 100.4 |
+| Paraphrase-MiniLM | 94.6 | 99.3 | 97.4 | 99.5 |
+| Sentence-T5 | 95.9 | 100.2 | 97.8 | 99.9 |
+
+PCA is usually a little better, but random truncation is surprisingly close and even wins for Contriever and E5-large on BEIR.
+
+![Our reproduction of Table 2: random truncation against PCA](figures/fig_pca_vs_random.png)
+
+## 2.10 Large language models
+
+The same idea applied to a causal LLM: remove the first or the last half of the final hidden state and the matching half of the unembedding matrix, then score with the Language Model Evaluation Harness. Table 3 (performance and, in brackets, relative performance):
+
+| Model | Task | Full | First half removed | Last half removed |
+|---|---|---|---|---|
+| Llama 3.1 8B | MMLU acc | 0.681 | 0.580 (0.852) | 0.586 (0.861) |
+| Llama 3.1 8B | SQuAD v2 best exact | 51.87 | 50.07 (0.965) | 50.07 (0.965) |
+| Llama 3.1 8B | GSM8K strict EM | 0.764 | 0.009 (0.012) | 0.014 (0.018) |
+| Qwen 2.5 7B | MMLU acc | 0.718 | 0.709 (0.988) | 0.709 (0.987) |
+| Qwen 2.5 7B | SQuAD v2 best exact | 50.12 | 50.07 (0.999) | 50.07 (0.999) |
+| Qwen 2.5 7B | GSM8K strict EM | 0.766 | 0.045 (0.059) | 0.011 (0.014) |
+
+Multiple-choice and extraction tasks keep more than 80% of the quality, but math word problems (GSM8K) collapse, so the effect is task dependent for LLMs.
+
+## 2.11 Limitations the authors state
+
+- The cause of the degrading dimensions is unknown.
+- Only single-dimension attribution is studied, not groups.
+- English only.
+- The relation to Matryoshka (MRL) models is untested (an informal check found MRL and non-MRL MPNet comparable).
+
+## 2.12 What the paper does not address (our critique)
+
+We found nine points; the three that matter most were tested with new experiments.
+
+```mermaid
+flowchart TD
+    P["Paper: degrading dimensions exist, so random cuts are harmless"] --> Q1["Q1 Are they found and evaluated on the same queries?"]
+    P --> Q2["Q2 Are single-dimension effects bigger than noise?"]
+    P --> Q3["Q3 Is there a simpler mechanism for random cuts?"]
+    Q1 --> X1["X1 Held-out test: choose dimensions on half the queries,<br/>evaluate on the other half"]
+    Q2 --> X2["X2 Bootstrap over queries (1000 resamples)"]
+    Q3 --> X3["X3 Sampling theory: a random subset estimates<br/>the dot product without bias"]
+    X1 --> R1["Gains above 100% vanish on held-out queries"]
+    X2 --> R2["Significant degrading dimensions are at chance level"]
+    X3 --> R3["Predicts rank stability for 5 of 6 models"]
+```
+
+**X1. Selection leakage.** The paper identifies degrading dimensions and evaluates their removal on the same queries (Fig 5, 12), so gains above 100% may be selection on noise. We split queries 50/50 five times, select on half A and test on half B. Gains of up to 103% in sample become 97.9 to 100.2% held out, and the per-dimension effects on the two halves are uncorrelated (r between -0.05 and 0.01).
+
+![X1: in-sample against held-out removal of degrading dimensions](figures/fig_leakage.png)
+
+**X2. Significance.** Per-dimension effects are about 3 to 5e-4 nDCG@10, while the standard error of the benchmark score is 0.012 (23 to 43 times larger). Only 8 to 22 degrading dimensions per model have a 95% bootstrap interval excluding zero, about what chance gives (9.6 to 19.2).
+
+![X2: bootstrap significance of the degrading dimensions](figures/fig_bootstrap.png)
+
+**X3. A mechanism the paper does not give.** A score q.d is a sum of n per-dimension products. A random subset of m dimensions gives an unbiased estimate of that sum (scaled by n/m) whose variance depends on how spread out the products are, with a finite-population correction (n - m)/(n - 1). Two documents swap order only when their score gap is smaller than that noise. Our formula predicts the observed rank correlation within 0.03 for 5 of 6 models; it fails for E5 because it ignores renormalisation. Contriever has the most concentrated contributions (participation ratio 0.04), consistent with it being the most fragile.
+
+```mermaid
+flowchart LR
+    S["score = sum of n products q_j * d_j"] --> M["keep a random m of n dimensions"]
+    M --> U["n/m times the partial sum<br/>is an unbiased estimate of the score"]
+    U --> V["variance = spread of the products<br/>x finite population correction"]
+    V --> F["documents swap when score gap < noise"]
+    F --> P["predicted Spearman, compared with observed"]
+```
+
+![X3: predicted against observed rank correlation](figures/fig_theory_vs_observed.png)
+
+Other points: Table 4 repeats the Table 3 MMLU numbers in its HellaSwag column and COPA F1 equals DROP F1 in every row (likely copy errors); SQuAD v2 scores 50.07 for every truncated model, about the share of unanswerable questions, so the model probably always answers "no answer"; the anisotropy test varies checkpoints of only two small models; Contriever, the least robust model, is the only one using an unnormalised dot product, which the paper does not discuss; the claim that degrading dimensions are "uniformly distributed" is made visually, not tested.
+
+## 2.13 How the live demo maps to the paper
+
+```mermaid
+flowchart LR
+    subgraph Paper
+    P1["Fig 1 and 2: relative performance against K"]
+    P2["Table 2: random 50% for Para-MiniLM, BEIR 94.6, MTEB 97.4"]
+    P3["Sec 4: remove, do not zero"]
+    end
+    subgraph Demo["Live demo output"]
+    D1["Truncation table, kept (%) next to paper avg"]
+    D2["Verdict line: retrieval 94.2, classification 97.7"]
+    D3["remove vs zero line"]
+    end
+    P1 --> D1
+    P2 --> D2
+    P3 --> D3
+```
+
+---
+
+# Part 3. Our reproduction
+
+Everything below documents what we built to test the paper: results against the paper's numbers, scope, method, repository layout and how to regenerate every result. Per-claim tables are in [RESULTS.md](RESULTS.md), all scope decisions and the audit in [REPRO_NOTES.md](REPRO_NOTES.md), the viva questions in [docs/VIVA.md](docs/VIVA.md).
+
+### 3.1 What this repository reproduces
 
 | Paper element | Experiment | Status |
 |---|---|---|
@@ -234,7 +507,7 @@ The paper removes K% of the dimensions of sentence embeddings, either the last K
 | Table 3: LLM hidden state truncation | S1 | Reproduced on Qwen2.5-0.5B |
 | Not in the paper | X1 selection leakage, X2 significance, X3 sampling theory | Extensions |
 
-## 4. Headline results
+### 3.2 Headline results
 
 | Claim | This reproduction | Paper |
 |---|---|---|
@@ -254,7 +527,7 @@ Main findings:
 
 Every claim, with the reproduced number, the paper's number and a note on agreement, is in [RESULTS.md](RESULTS.md).
 
-## 5. Scope
+### 3.3 Scope
 
 | Paper | This reproduction |
 |---|---|
@@ -266,7 +539,7 @@ Every claim, with the reproduced number, the paper's number and a note on agreem
 
 Every reduction is justified, and every protocol choice and deviation is recorded, in [REPRO_NOTES.md](REPRO_NOTES.md).
 
-## 6. Method and implementation
+### 3.4 Method and implementation
 
 All truncation, metric, attribution and evaluation code is implemented independently in numpy and torch. Pretrained encoders and Hugging Face datasets are used only as inputs. The authors' code was not used.
 
@@ -286,7 +559,7 @@ and for the dot product the term q_i d_i is simply subtracted. A dimension is de
 
 **Sampling theory** (`src/theory.py`). For a document pair (a, b) and query q, let r_j = q_j (a_j - b_j). Keeping a random m of n dimensions estimates the score difference sum_j r_j with variance n^2 sigma_r^2 / m x (n - m) / (n - 1) (sampling without replacement). The probability that the pair swaps order follows from a normal approximation; averaging over pairs gives a predicted Kendall tau, converted to Spearman through the Gaussian relation.
 
-## 7. Repository layout
+### 3.5 Repository layout
 
 ```
 docs/                     paper, assignment brief, reference numbers (PAPER_NOTES.md)
@@ -329,7 +602,7 @@ RESULTS.md                reproduced numbers vs the paper, claim by claim
 REPRO_NOTES.md            scope reductions, protocol, deviations, runtimes, weaknesses
 ```
 
-## 8. Reproducing all results
+### 3.6 Reproducing all results
 
 Every result and figure is regenerated from the cache with one script (about 1.5 hours on CPU). On Windows it runs in Git Bash. If `cache/emb/READY` is missing, it first encodes every dataset (about 50 minutes on a laptop RTX 4060, several hours on CPU).
 
@@ -343,7 +616,7 @@ The Qwen2.5-0.5B experiment needs a GPU and downloads the model and benchmark it
 RUN_S1=1 bash run_all.sh
 ```
 
-## 9. Outputs
+### 3.7 Outputs
 
 Each figure is generated from the csv listed next to it, which contains the plotted values.
 
@@ -366,7 +639,7 @@ Each figure is generated from the csv listed next to it, which contains the plot
 
 Live run: `live_small_<model>_<dataset>.csv` and `live_small_cls_<model>_<task>.csv` (the `_fast` variants come from `--fast`). Other results: `e0_*` (full scores, encoding times, metric check), `e1_*` (all truncation runs per dataset and seed), `e2_*` (Spearman per dataset), `e3_pca.csv`, `e4_mrl.csv`, `e5_remove_vs_zero.json`, `e7_attribution_classification.csv`, `x1_*`, `x2_*`, `x3_*`, `s1_*` (LLM results and generated GSM8K answers).
 
-## 10. Key design decisions
+### 3.8 Key design decisions
 
 - **NanoBEIR instead of full BEIR.** The paper itself uses NanoBEIR for its largest model and for all attribution analyses, and its 13 datasets cover every BEIR domain at 50 queries each.
 - **Closed form attribution.** Removing a dimension changes q.d by exactly q_i d_i, so all D leave-one-out scores follow from one score matrix; this makes E7, X1 and X2 take minutes instead of hours.
@@ -375,7 +648,7 @@ Live run: `live_small_<model>_<dataset>.csv` and `live_small_cls_<model>_<task>.
 - **One device for all reported numbers.** CPU and GPU arithmetic differ by up to 2e-4 nDCG@10, the same size as single dimension effects, so every reported number comes from one CPU run.
 - **Held out evaluation (X1).** Selecting dimensions and evaluating on the same queries cannot separate a real effect from selection on noise; splitting queries can.
 
-## 11. Limitations
+### 3.9 Limitations
 
 - Four of the twelve MTEB classification tasks are used, and NanoBEIR (50 queries per dataset) replaces full BEIR.
 - E5-base-v2 stands in for E5-large; E5-Mistral (7B) and Sentence-T5 are not included.
@@ -385,6 +658,6 @@ Live run: `live_small_<model>_<dataset>.csv` and `live_small_cls_<model>_<task>.
 
 The 7B to 8B models and the retraining experiment need more GPU memory than the 8 GB laptop GPU used here. The course HPC was considered for them, but on the run date the course account was limited to a shared half of one GPU (Slurm QOS `gres/gpu=0`, `mps=50`, 4 CPUs, 80 GB RAM), all five GPUs of the only partition open to it were allocated to multi day jobs, and 22 jobs were queued ahead. These experiments are therefore left as future work. Details and further weaknesses are listed in [REPRO_NOTES.md](REPRO_NOTES.md).
 
-## 12. Hardware
+### 3.10 Hardware
 
 Developed and run on a laptop: NVIDIA GeForce RTX 4060 Laptop GPU (8 GB), 16 logical CPU cores, 16 GB RAM, Windows 11, Python 3.13. Per step runtimes are in REPRO_NOTES.md.
