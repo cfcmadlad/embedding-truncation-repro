@@ -8,9 +8,67 @@ Prepared for CS F429 (Introduction to NLP), BITS Pilani Hyderabad, Group 12, pap
 
 ## 1. Quick start
 
+There are two ways to run this repository. The lite kit runs the paper's core experiment live on your own CPU in about a minute and needs no large download. The full cache (1.7 GB) is only needed for the Streamlit demo and for regenerating every result.
+
+### 1a. Lite kit: the live run
+
+**What it is.** `scripts/live_small.py` encodes NanoSciFact (50 queries, 2,919 documents) with `paraphrase-MiniLM-L3-v2` on the CPU, removes the last K% and a random K% (10 seeds) of the dimensions for K = 0 to 90, and prints nDCG@10 next to the paper's Figure 1 average. It also checks that removing and zeroing dimensions give the same score, and repeats the experiment for classification on Banking77. It ends with a one-line verdict. No GPU is used.
+
+**Requirements.** Python 3.10 to 3.13 (check with `python --version`), 3 GB of free disk space for the packages, and internet once to install them. After that the live run works offline.
+
+**Option A: zip file.** Copy `embedding-truncation-lite.zip` from the USB stick, unzip it, open a terminal in the unzipped folder and run:
+
+Windows (Command Prompt or PowerShell):
+
+```bash
+.\run.bat
+```
+
+macOS or Linux:
+
+```bash
+./run.sh
+```
+
+The first call creates `.venv` and installs `requirements-demo.txt` (5 to 8 minutes). Later calls start immediately. Do the first call at home on a good connection, not in the room.
+
+**Option B: git clone.** The lite files (model weights, data) are not in git; fetch them once:
+
+```bash
+git clone https://github.com/cfcmadlad/embedding-truncation-repro.git
+```
+
+```bash
+cd embedding-truncation-repro
+```
+
+```bash
+python scripts/fetch_lite.py
+```
+
+then run `run.bat` or `./run.sh` as above. `python scripts/fetch_lite.py --zip` builds `dist/embedding-truncation-lite.zip` for the USB stick.
+
+**Launcher modes.**
+
+| Command | What it does | Time on a laptop CPU |
+|---|---|---|
+| `run.bat` | full live run: retrieval and classification | about 1 minute |
+| `run.bat fast` | cuts the corpus to 400 documents (all judged ones kept); add `--threads 1` for a slow CPU | about 30 to 60 s |
+| `run.bat replay` | prints the stored csv, labelled as stored | 1 s |
+| `run.bat check` | prints ok or FAIL for Python, packages, files and a smoke run | 20 s |
+| `run.bat selfcheck` | runs all of the above and writes `selfcheck_report_<host>.txt` | 3 minutes |
+| `run.bat test` | pytest | 10 s |
+| `run.bat streamlit` | Streamlit demo (needs the full cache, see 1b) | |
+
+`./run.sh <mode>` takes the same modes. If the live run cannot encode (model files missing, any error), it prints the stored result instead, clearly labelled `STORED RESULT, NOT RECOMPUTED`.
+
+The expected output, step by step, with the sentence to say for each part, is in [docs/RUN_SHEET.md](docs/RUN_SHEET.md). The 5-minute check for a teammate's own laptop is in [docs/SELF_CHECK.md](docs/SELF_CHECK.md).
+
+### 1b. Full cache: Streamlit demo and all experiments
+
 The demo and every experiment run on CPU from precomputed embeddings; no GPU is required. Setup takes about 15 minutes and 6 GB of free disk space.
 
-**Requirements.** Python 3.12 or later (3.13 recommended; the pinned numpy 2.5.2 needs 3.12+) and Git. On Windows, the option "Add python.exe to PATH" must be ticked in the Python installer.
+**Requirements.** Python 3.12 or later (3.13 recommended; the pinned numpy 2.5.2 needs 3.12+) and Git. On Windows, the option "Add python.exe to PATH" must be ticked in the Python installer. The lite kit (1a) is enough for the live run; this section is only for the demo and for regenerating results.
 
 **Step 1. Clone the repository.**
 
@@ -62,7 +120,7 @@ python scripts/fetch_cache.py
 
 It prints download progress and ends with `cache/ ready`. If the download is interrupted, the same command with `--force` starts it again. Alternatively, `cache_part1.zip` and `cache_part2.zip` can be downloaded from the release page and extracted into the repository folder, so that the file `cache/emb/READY` exists.
 
-**Step 5. Check the setup.** The command below prints full and truncated scores in about a second:
+**Step 5. Check the setup.** The command below prints full and truncated scores in about a second after the imports:
 
 ```bash
 python scripts/demo_cli.py --model mpnet --dataset NanoSciFact --k 50 --method random --seed 0
@@ -76,15 +134,15 @@ Expected output: full nDCG@10 0.6967, truncated nDCG@10 0.6908, relative 99.15%.
 streamlit run demo/app.py
 ```
 
-The demo opens in the browser. The first load takes about 30 seconds; later interactions take under 2 seconds.
+The demo opens in the browser. The first load takes about 10 seconds; later interactions take under 1.5 seconds, except that classification with PCA or the degrading and improving methods refits 10 logistic regressions (about 5 s the first time, then cached).
 
 ### Using the demo
 
-The sidebar selects the model, the dataset, the truncation method (last-K, random-K with a seed, PCA, remove degrading dimensions, remove improving dimensions) and K, the percentage of dimensions removed. The main panel shows the full and truncated scores (nDCG@10 for retrieval, accuracy for classification), relative performance, the rank correlation between full and truncated rankings, and the truncation curve with the current setting marked against the paper's value. The query panel lists the top 5 documents for a chosen query before and after truncation, with rank changes marked. A new query can also be typed in; this is the only step that runs an encoder, and the first typed query downloads that encoder from Hugging Face once, so it needs an internet connection. The second tab, "Critique", shows the leakage, significance and sampling theory results.
+The sidebar selects the model, the dataset, the truncation method (last-K, random-K with a seed, PCA, remove degrading dimensions, remove improving dimensions) and K, the percentage of dimensions removed. The main panel shows the full and truncated scores (nDCG@10 for retrieval, accuracy for classification), relative performance, the rank correlation between full and truncated rankings, and the truncation curve with the current setting marked against the paper's value. The query panel lists the top 5 documents for a chosen query before and after truncation, with rank changes marked. A new query can also be typed in; this is the only step that runs an encoder, and it needs that encoder on disk because the demo runs with `HF_HUB_OFFLINE=1`: save it once with `python scripts/fetch_lite.py --models mpnet` (any of minilm, mpnet, contriever, e5, mrl, nonmrl), or set `HF_HUB_OFFLINE=0` before launching to let it download from Hugging Face. The second tab, "Critique", shows the leakage, significance and sampling theory results.
 
 ### Command line fallback
 
-The command line tool prints the same numbers as the demo and is a fallback if the browser app is unavailable:
+The command line tool prints the same numbers as the demo from the cache and is a fallback if the browser app is unavailable (for the same setting it agrees with the live run, for example MiniLM, NanoSciFact, random 50%, seed 0: 0.4447):
 
 ```bash
 python scripts/demo_cli.py --model mpnet --dataset NanoSciFact --k 50 --method random --seed 0
@@ -114,6 +172,10 @@ python scripts/demo_cli.py --model mpnet --dataset NanoSciFact --k 50 --method r
 | `No matching distribution found for numpy==2.5.2` | The Python version is older than 3.12; install Python 3.12 or later and recreate `.venv` |
 | `FileNotFoundError` mentioning `cache/emb` | Step 4 has not completed; run `python scripts/fetch_cache.py --force` |
 | `streamlit` is not recognised | The virtual environment is not active; run the activation command from Step 2 |
+| `run.bat` says `FAIL: no Python 3.10 to 3.13` | Install Python 3.12 from python.org and tick "Add python.exe to PATH" |
+| pip fails with `CERTIFICATE_VERIFY_FAILED` | Antivirus HTTPS scanning; the launcher retries once with certificate checks relaxed for pypi.org and files.pythonhosted.org only |
+| The live run prints `STORED RESULT, NOT RECOMPUTED` | Encoding failed (model files missing or another error); run `run.bat check`, read the FAIL line, then `python scripts/fetch_lite.py` |
+| Streamlit says the port is in use | Add `--server.port 8600` to the streamlit command |
 
 ## 2. The paper in brief
 
@@ -151,7 +213,7 @@ The paper removes K% of the dimensions of sentence embeddings, either the last K
 Main findings:
 
 1. **The core claim reproduces.** Random removal of half the dimensions keeps most of the performance, with Contriever as the fragile outlier, as in the paper.
-2. **The paper's explanation does not survive a held out test (X1, X2).** Degrading dimensions chosen on one half of the queries give no gain on the other half (best held out result 100.3%), and their per dimension effects on two disjoint query halves are uncorrelated (r between -0.05 and 0.01). The number of degrading dimensions with a bootstrap confidence interval excluding zero is at the level expected by chance, and the median effect of one dimension (3 to 6e-4 nDCG@10) is about 25 times smaller than the standard error of the benchmark score (0.012).
+2. **The paper's explanation does not survive a held out test (X1, X2).** Degrading dimensions chosen on one half of the queries give no gain on the other half (best held out result 100.3%), and their per dimension effects on two disjoint query halves are uncorrelated (r between -0.05 and 0.01). The number of degrading dimensions with a bootstrap confidence interval excluding zero is at the level expected by chance, and the median effect of one dimension (3 to 5e-4 nDCG@10) is 23 to 43 times smaller than the standard error of the benchmark score (0.012).
 3. **A simpler mechanism explains the robustness (X3).** A score q.d is a sum of per dimension products, and a random subset of dimensions gives an unbiased, scaled estimate of that sum. Rankings survive whenever contributions are spread over many dimensions. This model predicts the observed rank correlation at 50% within 0.03 for 5 of 6 models, and identifies Contriever as the model with the most concentrated contributions.
 
 Every claim, with the reproduced number, the paper's number and a note on agreement, is in [RESULTS.md](RESULTS.md).
@@ -197,13 +259,19 @@ src/
   encode.py               model registry, prefixes, encoding and caching
   metrics.py              nDCG@10, Spearman, MTEB logistic regression protocol
   truncate.py             last-K, random-K, index removal, PCA
-  evaluate.py             retrieval and classification evaluators over cached arrays
+  evaluate.py             retrieval and classification evaluators over cached or live arrays
+  live.py                 subset, sweep, remove-vs-zero, classification plan, replay; shared by the live run
+  runtime.py              thread count, CPU forcing, UTF-8 console
   attribution.py          leave-one-dimension-out, outliers, anisotropy metrics
   theory.py               subsampling variance and rank swap model
   paper.py                every reference number taken from the paper
   plotting.py             shared figure style and model colours
 scripts/
   fetch_cache.py          download the precomputed embeddings from the release
+  fetch_lite.py           save the MiniLM weights and the live-run data into lite/, build the zip
+  live_small.py           live run: encode, truncate, compare with the paper, replay fallback
+  check_setup.py          ok / FAIL check of Python, packages, files and a smoke run
+  self_check.py           runs the checks and live runs and writes a report to send back
   encode_all.py           encode every model and dataset into cache/
   e0_full_scores.py       full dimension scores and pytrec_eval check
   e1 ... e10              paper experiments (section 3)
@@ -214,6 +282,13 @@ demo/app.py, demo/core.py Streamlit demo
 results/                  machine readable output of every experiment (csv, json)
 figures/                  every figure as 200 dpi png (2400 x 1350) and pdf
 run_all.sh                regenerates all results and figures
+run.bat, run.sh           one-step launchers for the live run (venv, install, run)
+requirements-demo.txt     CPU-only version ranges for the live run and the demo (Python 3.10 to 3.13)
+tests/                    pytest: metrics, truncation, remove vs zero, subset, fallback
+lite/                     MiniLM weights and live-run data (weights are not in git)
+docs/RUN_SHEET.md         commands, expected output, what to say, fallbacks
+docs/VIVA.md              likely viva questions with answers
+docs/SELF_CHECK.md        5-minute check for a teammate's laptop
 RESULTS.md                reproduced numbers vs the paper, claim by claim
 REPRO_NOTES.md            scope reductions, protocol, deviations, runtimes, weaknesses
 ```
@@ -253,7 +328,7 @@ Each figure is generated from the csv listed next to it, which contains the plot
 | fig_theory_vs_observed | results/x3_theory_vs_observed.csv |
 | fig_concentration_vs_drop | results/x3_concentration.csv, results/x3_correlations.csv |
 
-Other results: `e0_*` (full scores, encoding times, metric check), `e1_*` (all truncation runs per dataset and seed), `e2_*` (Spearman per dataset), `e3_pca.csv`, `e4_mrl.csv`, `e5_remove_vs_zero.json`, `e7_attribution_classification.csv`, `x1_*`, `x2_*`, `x3_*`, `s1_*` (LLM results and generated GSM8K answers).
+Live run: `live_small_<model>_<dataset>.csv` and `live_small_cls_<model>_<task>.csv` (the `_fast` variants come from `--fast`). Other results: `e0_*` (full scores, encoding times, metric check), `e1_*` (all truncation runs per dataset and seed), `e2_*` (Spearman per dataset), `e3_pca.csv`, `e4_mrl.csv`, `e5_remove_vs_zero.json`, `e7_attribution_classification.csv`, `x1_*`, `x2_*`, `x3_*`, `s1_*` (LLM results and generated GSM8K answers).
 
 ## 10. Key design decisions
 

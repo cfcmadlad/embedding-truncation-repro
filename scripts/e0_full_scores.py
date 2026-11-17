@@ -33,7 +33,7 @@ def pytrec_check(model: str, name: str) -> dict:
 
 
 def encoding_times() -> pd.DataFrame:
-    metas = [json.loads(p.read_text()) for p in EMB_DIR.glob("*/*.json")]
+    metas = [json.loads(p.read_text(encoding="utf-8")) for p in EMB_DIR.glob("*/*.json")]
     df = pd.DataFrame(metas)
     df["model_key"] = df["model"].map({s.hf_id: k for k, s in MODELS.items()})
     return df.groupby(["model_key", "model", "device", "dtype_encode", "gpu_duty_cycle"]).agg(texts=("n", "sum"), seconds=("seconds", "sum")).reset_index()
@@ -52,7 +52,7 @@ def main() -> None:
     summary = df.groupby(["model", "task"])["score"].mean().unstack()
     summary.to_csv(RES_DIR / "e0_full_scores_summary.csv")
     checks = [pytrec_check(m, n) for m in ("mpnet", "contriever") for n in ("NanoSciFact", "NanoArguAna")]
-    (RES_DIR / "e0_pytrec_check.json").write_text(json.dumps(checks, indent=1))
+    (RES_DIR / "e0_pytrec_check.json").write_text(json.dumps(checks, indent=1), encoding="utf-8")
     print(summary.round(4))
     print(pd.DataFrame(checks))
 

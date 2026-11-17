@@ -1,0 +1,11 @@
+numpy>=1.26,<3
+torch>=2.3,<3
+scikit-learn>=1.4,<2
+scipy>=1.11,<2
+pandas>=2.1,<3
+sentence-transformers>=3.0,<7
+transformers>=4.44,<6
+psutil>=5.9
+matplotlib>=3.8,<4
+streamlit>=1.40,<2
+pytest>=8

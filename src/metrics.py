@@ -4,7 +4,8 @@ import os
 
 import numpy as np
 import torch
-from sklearn.linear_model import LogisticRegression
+
+from src.runtime import threads
 
 
 def device() -> torch.device:
@@ -13,7 +14,7 @@ def device() -> torch.device:
 
 
 def n_jobs() -> int:
-    return int(os.environ.get("TRUNBED_JOBS", "6"))
+    return threads()
 
 
 torch.set_num_threads(n_jobs())
@@ -44,6 +45,7 @@ def ndcg_at_k(
 ) -> torch.Tensor:
     if exclude is not None:
         scores = scores.masked_fill(exclude, float("-inf"))
+    k = min(k, scores.shape[-1])
     idx = torch.topk(scores, k, dim=-1).indices
     gains = torch.gather(rel.expand(*scores.shape[:-2], *rel.shape), -1, idx)
     dcg = (gains * discounts(k, scores.device)).sum(-1)
@@ -90,6 +92,8 @@ def logreg_accuracy(
     y_test: np.ndarray,
     subsamples: list[np.ndarray],
 ) -> np.ndarray:
+    from sklearn.linear_model import LogisticRegression
+
     accs = []
     for idx in subsamples:
         clf = LogisticRegression(max_iter=100, random_state=42)

@@ -55,7 +55,7 @@ def prepare() -> None:
         r = gtest[i]
         g_items.append({"prompt": shots + f"Question: {r['question']}\nAnswer:", "target": r["answer"].split("####")[-1].strip()})
     ITEMS.parent.mkdir(parents=True, exist_ok=True)
-    ITEMS.write_text(json.dumps({"hellaswag": hs_items, "mmlu": mm_items, "gsm8k": g_items}))
+    ITEMS.write_text(json.dumps({"hellaswag": hs_items, "mmlu": mm_items, "gsm8k": g_items}), encoding="utf-8")
 
 
 class Truncated:
@@ -121,7 +121,7 @@ def run() -> None:
     import torch
     from transformers import AutoModelForCausalLM, AutoTokenizer
 
-    items = json.loads(ITEMS.read_text())
+    items = json.loads(ITEMS.read_text(encoding="utf-8"))
     tok = AutoTokenizer.from_pretrained(MODEL_ID)
     model = AutoModelForCausalLM.from_pretrained(MODEL_ID, dtype=torch.float16).cuda().eval()
     h = model.config.hidden_size
@@ -150,10 +150,10 @@ def run() -> None:
             gens.append({"target": it["target"], "pred": strict(g), "text": g})
         em = [int(x["pred"] == x["target"]) for x in gens]
         rows.append({"task": "GSM8K", "variant": name, "metric": "strict_em", "value": float(np.mean(em)), "n": len(em)})
-        (OUT / f"s1_gsm8k_{name}.json").write_text(json.dumps(gens, indent=1))
+        (OUT / f"s1_gsm8k_{name}.json").write_text(json.dumps(gens, indent=1), encoding="utf-8")
         print(name, round(time.perf_counter() - start, 1), [r for r in rows if r["variant"] == name], flush=True)
     OUT.mkdir(exist_ok=True)
-    with (OUT / "s1_llm.csv").open("w", newline="") as f:
+    with (OUT / "s1_llm.csv").open("w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=list(rows[0]))
         w.writeheader()
         w.writerows(rows)

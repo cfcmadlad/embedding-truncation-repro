@@ -8,7 +8,8 @@ from pathlib import Path
 
 import numpy as np
 
-from src.data import CACHE
+from src.data import CACHE, LITE
+from src.runtime import threads
 
 EMB_DIR = CACHE / "emb"
 
@@ -55,18 +56,23 @@ def has_emb(model: str, dataset: str, part: str) -> bool:
 _LOADED: dict[str, object] = {}
 
 
+def model_source(key: str) -> str:
+    local = LITE / "models" / key
+    return str(local) if (local / "modules.json").exists() else MODELS[key].hf_id
+
+
 def load_model(key: str, device: str | None = None):
     import torch
     from sentence_transformers import SentenceTransformer
 
     if key not in _LOADED:
         device = device or os.environ.get("TRUNBED_ENCODE_DEVICE", "cuda" if torch.cuda.is_available() else "cpu")
-        model = SentenceTransformer(MODELS[key].hf_id, device=device)
+        model = SentenceTransformer(model_source(key), device=device)
         model.max_seq_length = min(model.max_seq_length or 512, 512)
         if device == "cuda":
             model.half()
         else:
-            torch.set_num_threads(int(os.environ.get("SLURM_CPUS_PER_TASK", os.cpu_count() or 1)))
+            torch.set_num_threads(int(os.environ.get("SLURM_CPUS_PER_TASK", threads())))
         _LOADED[key] = model
     return _LOADED[key]
 
@@ -118,5 +124,5 @@ def encode_and_cache(key: str, dataset: str, part: str, texts: list[str], prefix
         "seconds": round(elapsed, 2),
         "gpu_duty_cycle": float(os.environ.get("TRUNBED_DUTY", "1")),
     }
-    path.with_suffix(".json").write_text(json.dumps(meta, indent=1))
+    path.with_suffix(".json").write_text(json.dumps(meta, indent=1), encoding="utf-8")
     return elapsed

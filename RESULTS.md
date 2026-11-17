@@ -2,26 +2,26 @@
 
 ## Summary
 
-Done: all of Phase 0 to 4 in CLAUDE.md. 6 encoders (4 core plus an MRL / non-MRL MPNet pair) on 13 NanoBEIR datasets and 4 MTEB classification tasks; experiments E1 to E10, extensions X1 to X3, S1 on Qwen2.5-0.5B; Streamlit demo and CLI fallback. Every number below comes from one clean run of `run_all.sh` on CPU from the cached embeddings (S1 ran separately on the local GPU). Skipped: E5-large, E5-Mistral, Sentence-T5, full BEIR, 8 of 12 MTEB tasks, and retraining BERT/T5 for anisotropy; reasons are in `REPRO_NOTES.md`.
+Done: all of Phase 0 to 4 in CLAUDE.md. 6 encoders (4 core plus an MRL / non-MRL MPNet pair) on 13 NanoBEIR datasets and 4 MTEB classification tasks; experiments E1 to E10, extensions X1 to X3, S1 on Qwen2.5-0.5B; Streamlit demo and CLI fallback. Every number below comes from one clean run of `run_all.sh` on CPU from the cached embeddings (S1 ran separately on the local GPU). A small live version (`scripts/live_small.py`, about 1 minute on a laptop CPU, lite kit without the 1.7 GB cache) reproduces the core claim on the presenter's machine; see the Live run section. Skipped: E5-large, E5-Mistral, Sentence-T5, full BEIR, 8 of 12 MTEB tasks, and retraining BERT/T5 for anisotropy; reasons are in `REPRO_NOTES.md`. On 17 Nov 2026 every table here was re-checked against `results/`; corrections are listed in REPRO_NOTES.md, Stage 1 audit.
 
 Headline findings:
 
 1. The core claim reproduces. Random 50% removal keeps 88.7 to 98.3% of NanoBEIR nDCG@10 (paper 87.3 to 97.7) and 93.1 to 97.0% of accuracy (paper 95.4 to 97.7). Contriever is again the fragile outlier.
-2. The paper's explanation (many "degrading" dimensions) does not survive a held out test. Removing degrading dims gains up to 2.7% only on the queries used to find them; on held out queries the best gain is +0.3% and the per dimension deltas of two disjoint query halves are uncorrelated (r between -0.05 and 0.01). Only 8 to 22 degrading dims per model have a bootstrap CI excluding zero, close to the 10 to 19 expected by chance, and the median per dimension effect (3 to 6e-4) is about 25 times smaller than the standard error of NanoBEIR nDCG@10 (0.012).
+2. The paper's explanation (many "degrading" dimensions) does not survive a held out test. Removing degrading dims gains up to 2.7% only on the queries used to find them; on held out queries the best gain is +0.3% and the per dimension deltas of two disjoint query halves are uncorrelated (r between -0.05 and 0.01). Only 8 to 22 degrading dims per model have a bootstrap CI excluding zero, close to the 10 to 19 expected by chance, and the median per dimension effect (3 to 5e-4) is 23 to 43 times smaller than the standard error of NanoBEIR nDCG@10 (0.012).
 3. A sampling view explains the robustness. A random subset of dimensions is an unbiased, scaled estimate of the dot product, so rankings survive when contributions are spread over many dimensions. The model predicts observed Spearman at 50% within 0.03 for 5 of 6 models, and Contriever has by far the most concentrated contributions (participation ratio 0.04 vs 0.19 to 0.92). Across only 6 models, however, the participation ratio is not a better single predictor of the 50% drop than IsoScore (r 0.50 vs -0.76); both are driven mostly by Contriever.
 
 ## Phase 0: full dimension scores
 
 | Model | NanoBEIR nDCG@10 ours | Paper (Fig 4a) | Mean accuracy, 4 tasks |
 |---|---|---|---|
-| Para-MiniLM-L3 | 0.4871 | 0.4835 | 0.586 |
+| Para-MiniLM-L3 | 0.4873 | 0.4835 | 0.586 |
 | MPNet base | 0.5807 | 0.5755 | 0.617 |
-| Contriever | 0.5283 | 0.524 | 0.585 |
-| E5-base-v2 | 0.6168 | 0.5765 (E5-large) | 0.624 |
+| Contriever | 0.5284 | 0.524 | 0.585 |
+| E5-base-v2 | 0.6170 | 0.5765 (E5-large) | 0.624 |
 | MPNet NLI MRL | 0.3945 | | 0.641 |
-| MPNet NLI | 0.4047 | | 0.626 |
+| MPNet NLI | 0.4052 | | 0.626 |
 
-Our full scores are within 0.005 of the paper for the three models we share. E5-base-v2 beats the paper's E5-large, which suggests the paper may not have used E5's `query:` / `passage:` prefixes. Per dataset: `results/e0_full_scores.csv`. Our nDCG@10 matches pytrec_eval exactly on NanoSciFact; on NanoArguAna one query differs because of tied scores between duplicate documents (`results/e0_pytrec_check.json`). Encoding: RTX 4060 Laptop, fp16, 50% duty throttle, 2 to 14 min per model (`results/e0_encoding_times.csv`).
+Our full scores are within 0.006 of the paper for the three models we share. E5-base-v2 beats the paper's E5-large, which suggests the paper may not have used E5's `query:` / `passage:` prefixes. Per dataset: `results/e0_full_scores.csv`. Our nDCG@10 matches pytrec_eval exactly on NanoSciFact; on NanoArguAna one query differs because of tied scores between duplicate documents (`results/e0_pytrec_check.json`). Encoding: RTX 4060 Laptop, fp16, 50% duty throttle, 2 to 14 min per model (`results/e0_encoding_times.csv`).
 
 ## C1. Random 50% removal keeps over 90% (retrieval) and 95% (classification)
 
@@ -154,7 +154,7 @@ Removing "degrading" dims chosen on half the queries does not help the other hal
 
 | Model | Degrading dims | CI excludes 0 | Expected by chance (2.5% per side) | Median abs delta | SE of NanoBEIR mean nDCG@10 |
 |---|---|---|---|---|---|
-| Para-MiniLM | 230 | 8 | 9.6 | 6e-4 | 0.013 |
+| Para-MiniLM | 230 | 8 | 9.6 | 5e-4 | 0.013 |
 | MPNet | 382 | 22 | 19.2 | 3e-4 | 0.013 |
 | Contriever | 341 | 8 | 19.2 | 5e-4 | 0.012 |
 | E5 | 244 | 8 | 19.2 | 5e-4 | 0.012 |
@@ -167,10 +167,28 @@ Spearman at random 50% on 300 sampled documents per query, predicted vs observed
 
 Participation ratio of per dimension score contributions: Para-MiniLM 0.92, E5 0.78, MPNet 0.66, MRL 0.21, non-MRL 0.19, Contriever 0.04. Correlation with relative nDCG@10 at random 50% (n = 6): participation ratio 0.50, predicted Spearman 0.61, IsoScore -0.76, inter dim correlation 0.64 (`results/x3_correlations.csv`, `fig_concentration_vs_drop`). Our prediction in CLAUDE.md, that concentration would beat the anisotropy metrics, is not supported with 6 models: every metric's correlation is driven by Contriever, and none separates the other five models.
 
+## Live run (CPU, scripts/live_small.py)
+
+Run on the presenter's laptop CPU with the GPU hidden, encoding everything live with Para-MiniLM-L3 (details and scope in REPRO_NOTES.md, "Live run"). Five rehearsals gave identical numbers.
+
+| Claim | Live run (NanoSciFact, 50 queries, 2,919 docs; Banking77, 2 subsamples) | Stored result (cached embeddings, 10 seeds) | Paper |
+|---|---|---|---|
+| Full nDCG@10 | 0.4713 | 0.4713 | not reported per dataset (NanoBEIR mean 0.4835) |
+| Random 50% keeps, retrieval | 94.2% (std over seeds 0.0168) | 94.2% (0.0168) | 94.6% (Table 2, Para-MiniLM, BEIR); Fig 1 average 95.5% |
+| Random 90% keeps, retrieval | 48.7% | 48.8% | Fig 1 average about 62% |
+| Last 50% keeps, retrieval | 95.1% | 95.1% | Fig 2a, the paper reports above 80% up to 80% removal |
+| Random 50% keeps, classification (Banking77) | 97.7% | 97.9% | 97.4% (Table 2, Para-MiniLM, MTEB); Fig 1 average 97.5% |
+| Removal against zeroing | nDCG@10 0.4447 and 0.4447, score difference 4e-7 | 9.9e-14 (float64) | not tested by the paper |
+| Seed 0, random 50% | 0.4447 | 0.4447 | |
+| Live against cached embeddings | at most 1.1e-3 apart (fp32 CPU against fp16 GPU) | | |
+
+Agreement: the live run reproduces the stored MiniLM numbers to the first decimal and sits within 0.4 points of the paper's Table 2 value for this model on retrieval and 0.3 points on classification. Runtime 43 to 55 s per full run (about 35 s for `--fast --threads 1`), identical numbers across 5 runs.
+
 ## Phase checkpoints
 
-- Phase 0: 6 models x 13 NanoBEIR + 4 MTEB tasks + 2 sentence sets encoded (166,078 texts per model). Full scores within 0.005 of the paper's.
+- Phase 0: 6 models x 13 NanoBEIR + 4 MTEB tasks + 2 sentence sets encoded (166,078 texts per model). Full scores within 0.006 of the paper's.
 - Phase 1: C1, C2, C3 and C11 reproduce, with Contriever as the fragile model. Removing and zeroing are identical. MRL only helps last-K.
 - Phase 2: outlier counts and effects match Table 1. Degrading dims are numerous but their identity does not match the paper's counts. In sample degrading removal exceeds 100%. Anisotropy shows no clean explanation.
 - Phase 3: degrading dim gains vanish on held out queries; significance is at chance level; the sampling theory predicts rank stability for 5 of 6 models.
 - Phase 4: the Qwen2.5-0.5B pattern matches Table 3 (multiple choice survives, GSM8K collapses).
+- Live run: the core claim reproduces on a CPU laptop in under a minute (random 50% keeps 94.2% of retrieval and 97.7% of classification with MiniLM; paper 94.6% and 97.4%), with the lite kit, tests and a replay fallback.

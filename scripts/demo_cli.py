@@ -9,6 +9,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "demo"))
 
 import core
 from src.encode import MODELS
+from src.runtime import setup_console
+
+setup_console()
 
 
 def main() -> None:

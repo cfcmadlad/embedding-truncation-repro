@@ -8,7 +8,9 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
 CACHE = ROOT / "cache"
+LITE = ROOT / "lite"
 TEXT_DIR = CACHE / "text"
+TEXT_DIRS = [TEXT_DIR, LITE / "data"]
 
 NANOBEIR = [
     "NanoArguAna",
@@ -74,6 +76,16 @@ def _read(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def text_path(name: str, fetch: bool, fetcher) -> Path:
+    for folder in TEXT_DIRS:
+        if (folder / f"{name}.json").exists():
+            return folder / f"{name}.json"
+    if not fetch:
+        raise FileNotFoundError(f"{name}.json not found in cache/text or lite/data; run python scripts/fetch_lite.py (or fetch_cache.py for the full cache)")
+    _write(TEXT_DIR / f"{name}.json", fetcher())
+    return TEXT_DIR / f"{name}.json"
+
+
 def _fetch_retrieval(name: str) -> dict:
     from datasets import load_dataset
 
@@ -97,11 +109,8 @@ def _fetch_retrieval(name: str) -> dict:
     }
 
 
-def load_retrieval(name: str) -> Retrieval:
-    path = TEXT_DIR / f"{name}.json"
-    if not path.exists():
-        _write(path, _fetch_retrieval(name))
-    raw = _read(path)
+def load_retrieval(name: str, fetch: bool = False) -> Retrieval:
+    raw = _read(text_path(name, fetch, lambda: _fetch_retrieval(name)))
     qpos = {q: i for i, q in enumerate(raw["query_ids"])}
     dpos = {d: j for j, d in enumerate(raw["doc_ids"])}
     rel = np.zeros((len(qpos), len(dpos)), dtype=np.float32)
@@ -127,11 +136,8 @@ def _fetch_classification(name: str) -> dict:
     return out
 
 
-def load_classification(name: str) -> Classification:
-    path = TEXT_DIR / f"{name}.json"
-    if not path.exists():
-        _write(path, _fetch_classification(name))
-    raw = _read(path)
+def load_classification(name: str, fetch: bool = False) -> Classification:
+    raw = _read(text_path(name, fetch, lambda: _fetch_classification(name)))
     return Classification(
         name,
         raw["train"]["texts"],
@@ -156,8 +162,5 @@ def _fetch_sentences(name: str) -> list[str]:
     return [pool[i] for i in np.sort(idx)]
 
 
-def load_sentences(name: str) -> list[str]:
-    path = TEXT_DIR / f"{name}.json"
-    if not path.exists():
-        _write(path, {"texts": _fetch_sentences(name)})
-    return _read(path)["texts"]
+def load_sentences(name: str, fetch: bool = False) -> list[str]:
+    return _read(text_path(name, fetch, lambda: {"texts": _fetch_sentences(name)}))["texts"]

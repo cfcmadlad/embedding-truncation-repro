@@ -193,3 +193,9 @@ hf_token*
 .venv/
 .streamlit/secrets.toml
 logs/
+
+# Lite kit and distribution
+lite/models/
+dist/
+.venv*/
+selfcheck_report_*.txt

@@ -68,15 +68,19 @@ def warm_encoder(model: str) -> None:
 
 
 @lru_cache(maxsize=None)
-def attribution_order(model: str, label: str) -> np.ndarray | None:
-    df = read_csv("e7_attribution_retrieval.csv")
+def attribution_order(model: str, label: str, task: str | None = None) -> np.ndarray | None:
+    df = read_csv("e7_attribution_classification.csv" if task else "e7_attribution_retrieval.csv")
     if df is None:
         return None
     df = df[(df.model == model) & (df.label == label)]
+    if task:
+        df = df[df.task == task]
+    if df.empty:
+        return None
     return df.reindex(df.delta.abs().sort_values(ascending=False).index).dim.to_numpy()
 
 
-def selection(model: str, method: str, frac: float, seed: int):
+def selection(model: str, method: str, frac: float, seed: int, task: str | None = None):
     dim = MODELS[model].dim
     removed = n_removed(dim, frac)
     if method == "last-K":
@@ -86,9 +90,9 @@ def selection(model: str, method: str, frac: float, seed: int):
     if method == "PCA":
         mean, comps = pca(model, dim - removed)
         return None, (mean, comps), removed
-    order = attribution_order(model, "degrading" if method == "remove degrading" else "improving")
+    order = attribution_order(model, "degrading" if method == "remove degrading" else "improving", task)
     if order is None:
-        raise FileNotFoundError("results/e7_attribution_retrieval.csv")
+        raise FileNotFoundError(f"attribution for {model} on {task}" if task else "results/e7_attribution_retrieval.csv")
     drop = order[:removed]
     return keep_without(dim, drop), None, len(drop)
 
@@ -134,7 +138,7 @@ def classification_result(model: str, task: str, method: str, frac: float, seed:
     removed = n_removed(dim, frac)
     if pre is None:
         ev = classification(model, task)
-        keep, proj, removed = selection(model, method, frac, seed)
+        keep, proj, removed = selection(model, method, frac, seed, task)
         nf = float(ev.accuracy().mean())
         nt = float(ev.accuracy(keep, (lambda x: pca_apply(x, *proj)) if proj else None).mean())
         pre = (nf, nt)

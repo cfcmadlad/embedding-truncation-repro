@@ -46,7 +46,7 @@ def main() -> None:
     worst = max(r[k] for part in out.values() for r in part for k in ("max_abs_diff_dot", "max_abs_diff_cos"))
     out["worst_abs_diff"] = worst
     out["identical_within_1e-10"] = bool(worst < 1e-10)
-    (RES_DIR / "e5_remove_vs_zero.json").write_text(json.dumps(out, indent=1))
+    (RES_DIR / "e5_remove_vs_zero.json").write_text(json.dumps(out, indent=1), encoding="utf-8")
     print(json.dumps({"worst_abs_diff": worst, "identical": out["identical_within_1e-10"]}))
 
 

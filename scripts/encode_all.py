@@ -12,15 +12,15 @@ from src.encode import MODELS, encode_and_cache
 
 def jobs():
     for name in NANOBEIR:
-        ds = load_retrieval(name)
+        ds = load_retrieval(name, fetch=True)
         yield name, "queries", ds.queries, "q"
         yield name, "docs", ds.docs, "d"
     for name in CLASSIFICATION:
-        ds = load_classification(name)
+        ds = load_classification(name, fetch=True)
         yield name, "train", ds.train_texts, "q"
         yield name, "test", ds.test_texts, "q"
     for name in SENTENCE_SETS:
-        yield name, "all", load_sentences(name), "q"
+        yield name, "all", load_sentences(name, fetch=True), "q"
 
 
 def main() -> None:

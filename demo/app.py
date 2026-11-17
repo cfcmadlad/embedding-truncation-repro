@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import io
 import sys
 import threading
 import time
@@ -31,6 +32,15 @@ def cached_eval(model: str, dataset: str, method: str, frac: float, seed: int) -
 @st.cache_data(show_spinner=False)
 def cached_top(model: str, dataset: str, method: str, frac: float, seed: int, query: str | None, qi: int | None):
     return core.top_docs(model, dataset, method, frac, seed, query, qi)
+
+
+@st.cache_data(show_spinner=False)
+def curve_png(model: str, dataset: str, method: str, frac: float, current: float) -> bytes:
+    fig = curve(model, dataset, method, frac, current)
+    buf = io.BytesIO()
+    fig.savefig(buf, format="png", dpi=110)
+    plt.close(fig)
+    return buf.getvalue()
 
 
 def curve(model: str, dataset: str, method: str, frac: float, current: float) -> plt.Figure:
@@ -82,8 +92,12 @@ def side(model: str, dataset: str, method: str, frac: float, seed: int) -> None:
     if query and warm.is_alive():
         with st.spinner("Loading the encoder (first query only)"):
             warm.join()
-    with st.spinner("Encoding query" if query else "Ranking"):
-        full, trunc = cached_top(model, dataset, method, frac, seed, query, None if query else int(choice))
+    try:
+        with st.spinner("Encoding query" if query else "Ranking"):
+            full, trunc = cached_top(model, dataset, method, frac, seed, query, None if query else int(choice))
+    except Exception as e:
+        st.error(f"Could not encode the typed query ({type(e).__name__}). The encoder must be on disk: python scripts/fetch_lite.py --models {model}")
+        return
     left, right = st.columns(2)
     for col, rows, title, other, sign in ((left, full, "Full embedding", "truncated", 1), (right, trunc, "Truncated embedding", "full", -1)):
         col.markdown(f"**{title}**")
@@ -94,21 +108,30 @@ def side(model: str, dataset: str, method: str, frac: float, seed: int) -> None:
             col.markdown(f"**{r}.** rank in {other}: {row['other_rank']} ({mark}){rel}  \n{row['doc']}")
 
 
-def critique() -> None:
-    items = [
-        ("fig_leakage", "X1 selection leakage", "x1_leakage.csv"),
-        ("fig_bootstrap", "X2 bootstrap significance", "x2_bootstrap.csv"),
-        ("fig_theory_vs_observed", "X3 theory vs observed", "x3_theory_vs_observed.csv"),
-        ("fig_concentration_vs_drop", "X3 concentration vs drop", "x3_concentration.csv"),
-    ]
-    for fig, title, csv in items:
-        st.subheader(title)
+CRITIQUE_ITEMS = [
+    ("fig_leakage", "X1 selection leakage", "x1_leakage.csv"),
+    ("fig_bootstrap", "X2 bootstrap significance", "x2_bootstrap.csv"),
+    ("fig_theory_vs_observed", "X3 theory vs observed", "x3_theory_vs_observed.csv"),
+    ("fig_concentration_vs_drop", "X3 concentration vs drop", "x3_concentration.csv"),
+]
+
+
+@st.cache_data(show_spinner=False)
+def critique_assets() -> list[tuple[str, str, bytes | None, pd.DataFrame | None]]:
+    out = []
+    for fig, title, csv in CRITIQUE_ITEMS:
         png = core.FIGURES / f"{fig}.png"
-        if png.exists():
-            st.image(str(png))
+        out.append((fig, title, png.read_bytes() if png.exists() else None, core.read_csv(csv)))
+    return out
+
+
+def critique() -> None:
+    for fig, title, png, df in critique_assets():
+        st.subheader(title)
+        if png is not None:
+            st.image(png)
         else:
             st.info(f"figures/{fig}.png not produced yet")
-        df = core.read_csv(csv)
         if df is not None:
             st.dataframe(df.head(20), width="stretch")
 
@@ -118,6 +141,9 @@ def main() -> None:
     model = st.sidebar.selectbox("Model", list(MODELS), format_func=lambda k: f"{k}: {MODELS[k].hf_id}")
     dataset = st.sidebar.selectbox("Dataset", core.DATASETS)
     method = st.sidebar.selectbox("Truncation method", core.METHODS)
+    if dataset in core.CLASSIFICATION and method not in ("last-K", "random-K"):
+        extra = " Degrading and improving dimensions exist only for minilm and mpnet on Banking77 and Emotion." if method.startswith("remove") else ""
+        st.sidebar.caption("This setting refits 10 logistic regressions: about 5 s the first time, then cached." + extra)
     seed = st.sidebar.number_input("Seed (random-K)", 0, 9, 0) if method == "random-K" else 0
     k = st.sidebar.slider("K: % of dimensions removed", 0, 90, 50, 10)
     frac = round(k / 100, 1)
@@ -130,7 +156,7 @@ def main() -> None:
             with st.spinner("Evaluating"):
                 res = cached_eval(model, dataset, method, frac, int(seed))
         except FileNotFoundError as e:
-            st.warning(f"Missing results file for this method: {e}")
+            st.warning(f"No stored result for this setting: {e}")
             return
         c = st.columns(3)
         c[0].metric(f"Full {res['metric']}", f"{res['full']:.4f}")
@@ -139,7 +165,7 @@ def main() -> None:
         c = st.columns(3)
         c[0].metric("Mean Spearman, full vs truncated ranking", "n/a" if res["spearman"] is None else f"{res['spearman']:.3f}")
         c[1].metric("Dims removed", f"{res['removed']} / {MODELS[model].dim}")
-        st.pyplot(curve(model, dataset, method, frac, res["relative"]), clear_figure=True)
+        st.image(curve_png(model, dataset, method, frac, round(res["relative"], 3)))
         st.caption(f"Computed in {time.perf_counter() - start:.2f} s")
         if dataset not in core.CLASSIFICATION:
             side(model, dataset, method, frac, int(seed))

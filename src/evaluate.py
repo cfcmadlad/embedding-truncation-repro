@@ -5,20 +5,20 @@ from functools import lru_cache
 import numpy as np
 import torch
 
-from src.data import CLASSIFICATION, NANOBEIR, load_classification, load_retrieval
+from src.data import CLASSIFICATION, NANOBEIR, Retrieval, load_classification, load_retrieval
 from src.encode import MODELS, load_emb
 from src.metrics import device, idcg, logreg_accuracy, mteb_subsamples, ndcg_at_k, similarity
 
 
 class RetrievalEval:
-    def __init__(self, model: str, name: str):
+    def __init__(self, model: str, name: str, q: np.ndarray | None = None, d: np.ndarray | None = None, ds: Retrieval | None = None):
         dev = device()
-        ds = load_retrieval(name)
+        ds = ds or load_retrieval(name)
         self.model = model
         self.name = name
         self.sim = MODELS[model].sim
-        self.q = torch.from_numpy(load_emb(model, name, "queries")).to(dev)
-        self.d = torch.from_numpy(load_emb(model, name, "docs")).to(dev)
+        self.q = torch.from_numpy(load_emb(model, name, "queries") if q is None else q).to(dev)
+        self.d = torch.from_numpy(load_emb(model, name, "docs") if d is None else d).to(dev)
         self.rel = torch.from_numpy(ds.qrels).to(dev)
         self.exclude = torch.from_numpy(ds.same_id_mask).to(dev)
         self.ideal = idcg(self.rel)
@@ -34,6 +34,9 @@ class RetrievalEval:
 
     def ndcg_scores(self, scores: torch.Tensor, k: int = 10) -> torch.Tensor:
         return ndcg_at_k(scores, self.rel, k, self.exclude, self.ideal)
+
+    def ndcg_mean(self, keep: np.ndarray | None = None) -> float:
+        return float(self.ndcg_scores(self.scores(keep)).mean())
 
     def ndcg(self, keep: np.ndarray | None = None, q: torch.Tensor | None = None, d: torch.Tensor | None = None) -> np.ndarray:
         return self.ndcg_scores(self.scores(keep, q, d)).cpu().numpy()
