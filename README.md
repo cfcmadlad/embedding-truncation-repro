@@ -1,10 +1,36 @@
 # Random Truncation of Text Embeddings: a Reproduction
 
-A scoped down, faithful reproduction of
+An independent, scoped reproduction of
 
 > Sotaro Takeshita, Yurina Takeshita, Daniel Ruffinelli and Simone Paolo Ponzetto. *Randomly Removing 50% of Dimensions in Text Embeddings has Minimal Impact on Retrieval and Classification Tasks.* EMNLP 2025.
 
-Prepared for CS F429 (Introduction to NLP), BITS Pilani Hyderabad, Group 12, paper 14. The repository contains an independent implementation of every truncation method, metric, attribution analysis and evaluation in the paper, precomputed embeddings for running all of it offline, three extension experiments that test the paper's explanation, and an interactive demo.
+CS F429 (Introduction to NLP), BITS Pilani Hyderabad, Group 12, paper 14.
+
+The repository contains our own implementation of every truncation method, metric, attribution analysis and evaluation in the paper, three extension experiments that test the paper's explanation, an interactive demo, and a **live run that re-tests the paper's core claim on your own CPU in about a minute**.
+
+| | |
+|---|---|
+| **Core claim** | Removing a random 50% of the dimensions of a text embedding keeps more than 90% of retrieval quality and more than 95% of classification accuracy. |
+| **Reproduced** | Yes: 88.7 to 98.3% (retrieval) and 93.1 to 97.0% (classification) across our encoders; the paper reports 87.3 to 97.7% and 95.4 to 97.7%. |
+| **Our extensions** | The paper's explanation (many "degrading" dimensions) does not survive a held-out test; a sampling argument explains the robustness instead. |
+| **Live run** | `run.bat` or `./run.sh`: encodes NanoSciFact and Banking77 live with MiniLM on a CPU, prints the truncation table next to the paper's numbers and a verdict. |
+
+## Contents
+
+1. [Quick start](#1-quick-start): [lite kit](#1a-lite-kit-the-live-run) (live run) and [full cache](#1b-full-cache-streamlit-demo-and-all-experiments) (demo and all experiments)
+2. [The paper in brief](#2-the-paper-in-brief)
+3. [What this repository reproduces](#3-what-this-repository-reproduces)
+4. [Headline results](#4-headline-results)
+5. [Scope](#5-scope)
+6. [Method and implementation](#6-method-and-implementation)
+7. [Repository layout](#7-repository-layout)
+8. [Reproducing all results](#8-reproducing-all-results)
+9. [Outputs](#9-outputs)
+10. [Key design decisions](#10-key-design-decisions)
+11. [Limitations](#11-limitations)
+12. [Hardware](#12-hardware)
+
+Further documents: [RESULTS.md](RESULTS.md) (every claim, our number and the paper's), [REPRO_NOTES.md](REPRO_NOTES.md) (scope, protocol, deviations, audit), [docs/RUN_SHEET.md](docs/RUN_SHEET.md) (live demo script), [docs/VIVA.md](docs/VIVA.md) (questions and answers), [docs/SELF_CHECK.md](docs/SELF_CHECK.md) (5-minute check for a teammate's laptop).
 
 ## 1. Quick start
 
@@ -16,7 +42,7 @@ There are two ways to run this repository. The lite kit runs the paper's core ex
 
 **Requirements.** Python 3.10 to 3.13 (check with `python --version`), 3 GB of free disk space for the packages, and internet once to install them. After that the live run works offline.
 
-**Option A: zip file.** Copy `embedding-truncation-lite.zip` from the USB stick, unzip it, open a terminal in the unzipped folder and run:
+**Option A: download the zip (recommended).** Download `embedding-truncation-lite.zip` (about 70 MB) from the [`lite-v1` release](https://github.com/cfcmadlad/embedding-truncation-repro/releases/tag/lite-v1) (or copy it from a USB stick), unzip it, open a terminal in the unzipped folder `embedding-truncation-lite` and run:
 
 Windows (Command Prompt or PowerShell):
 
@@ -31,6 +57,16 @@ macOS or Linux:
 ```
 
 The first call creates `.venv` and installs `requirements-demo.txt` (5 to 8 minutes). Later calls start immediately. Do the first call at home on a good connection, not in the room.
+
+Expected result (the last lines of the output):
+
+```
+retrieval       random 50% keeps 94.2% of nDCG@10 (paper bar: over 90%, paper Para-MiniLM: 94.6%)
+classification  random 50% keeps 97.7% of accuracy (paper bar: over 95%, paper Para-MiniLM: 97.4%)
+VERDICT  the paper's claim holds in this live run.
+```
+
+The last decimal can differ by a few thousandths on another CPU. Tested on Windows 11 with Python 3.10, 3.12 and 3.13; macOS and Linux are expected to work but have not been run by us.
 
 **Option B: git clone.** The lite files (model weights, data) are not in git; fetch them once:
 
